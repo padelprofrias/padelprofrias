@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html class="h-full bg-slate-950 text-slate-100" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>PadelHub — Donde nace la competencia real</title>
+  <meta name="description" content="PadelHub — Ligas, torneos, tablas, fixture y marcador en vivo profesional. Donde juegan los que compiten en serio.">
+  <meta name="theme-color" content="#090d16">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Tailwind CSS CDN with plugins -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { lime: '#a3e635', limeHover: '#bef264', limeDark: '#4d7c0f', dark: '#090d16', card: '#0f172a' },
+            'primary':                  '#a3e635',
+            'primary-container':        '#a3e635',
+            'on-primary':               '#020617',
+            'on-primary-fixed':         '#020617',
+            'secondary':                '#38bdf8',
+            'secondary-container':      '#38bdf8',
+            'on-secondary':             '#020617',
+            'tertiary':                 '#c084fc',
+            'error':                    '#ef4444',
+            'on-error':                 '#ffffff',
+            'on-surface':               '#e2e8f0',
+            'on-surface-variant':       '#94a3b8',
+            'outline':                  '#64748b',
+            'surface-container':        '#0f172a',
+            'surface-container-high':   '#1e293b',
+            'surface-container-highest':'#334155',
+            'surface-container-low':    '#020617',
+            'surface-container-lowest': '#010409',
+            'surface-bright':           '#475569',
+          },
+          boxShadow: {
+            'glow-lime': '0 0 25px -5px rgba(163, 230, 53, 0.35)',
+            'glow-cyan': '0 0 25px -5px rgba(56, 189, 248, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+  <style>
+    /* Court Grid Background */
+    .court-grid-pattern {
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(163,230,53,0.12), transparent 45%),
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 64px 64px, 64px 64px;
+    }
+    .h-13 { height: 3.25rem; }
+
+    /* M3 Typography Tokens */
+    .font-headline-xl,.text-headline-xl { font-size: clamp(2.5rem,6vw,3.5rem); line-height:1.08; font-weight:900; }
+    .font-headline-lg,.text-headline-lg { font-size:1.5rem; line-height:1.2; font-weight:700; }
+    .font-headline-md,.text-headline-md { font-size:1.125rem; line-height:1.35; font-weight:600; }
+    .font-body-lg,.text-body-lg { font-size:1.05rem; line-height:1.6; }
+    .font-body-md,.text-body-md { font-size:0.875rem; line-height:1.55; }
+    .font-label-lg,.text-label-lg { font-size:0.875rem; line-height:1.4; font-weight:600; }
+    .font-label-md,.text-label-md { font-size:0.75rem; line-height:1.4; font-weight:600; }
+    .font-label-sm,.text-label-sm { font-size:0.6875rem; line-height:1.4; font-weight:500; }
+    .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans court-grid-pattern antialiased selection:bg-brand-lime selection:text-slate-950">
+
+<!-- ═══════════════ NAVIGATION ═══════════════ -->
+<header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <a class="flex items-center gap-3 group" href="index.html" title="PadelHub Inicio">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-lime to-emerald-400 flex items-center justify-center shadow-glow-lime transform transition-transform group-hover:scale-105">
+        <i class="w-6 h-6 text-slate-950 stroke-[2.5]" data-lucide="shield"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-black tracking-tight text-white uppercase italic">Padel<span class="text-brand-lime">Hub</span></span>
+        <span class="text-[10px] tracking-widest text-slate-400 font-semibold uppercase -mt-1">SISTEMA DE COMPETICIÓN</span>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide">
+      <a class="text-white" href="index.html">INICIO</a>
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="ligas.html">LIGAS</a>
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="torneos.html">TORNEOS</a>
+      <a class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700/60 text-slate-200 hover:border-brand-lime hover:text-brand-lime text-xs tracking-wider transition-all duration-200 shadow-sm" href="vivo.html">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> MARCADOR EN VIVO
+      </a>
+    </nav>
+    <button class="md:hidden text-slate-400 hover:text-white" onclick="document.getElementById('mobile-nav').classList.toggle('hidden')">
+      <i data-lucide="menu" class="w-6 h-6"></i>
+    </button>
+  </div>
+  <nav id="mobile-nav" class="hidden md:hidden border-t border-slate-800 bg-slate-950 px-4 pb-4 space-y-1">
+    <a class="block py-2.5 text-white font-semibold" href="index.html">Inicio</a>
+    <a class="block py-2.5 text-slate-400 hover:text-white" href="ligas.html">Ligas</a>
+    <a class="block py-2.5 text-slate-400 hover:text-white" href="torneos.html">Torneos</a>
+    <a class="block py-2.5 text-slate-400 hover:text-white" href="vivo.html">🔴 Marcador en Vivo</a>
+  </nav>
+</header>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="flex-grow">
+
+<!-- ─── HERO ─── -->
+<section class="relative w-full overflow-hidden py-12 lg:py-20">
+  <div class="absolute inset-0 z-0">
+    <img alt="Jugador de pádel en acción" class="w-full h-full object-cover object-center opacity-40 brightness-75 scale-105 transform" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWOk6Up2cBDE92CpqzR8HWoTN4d2v8Ff0ILvzilEcOXYrbaPEyDkx7BFQSIWssr9xDE-n5b5f6wAfc5aTaHT4JxqFqrVVjPH-2lfO_4LolhSwmpUrxy6au-xrZR-eUvTaememuxP8vuxVgbCJCBB8t1d3EEtTW6wCXJ3ndqLf3gOCMBM167m_KxQXrvHGWTtsOpNztZ72kpm-MYpe4VoGOIHeooxRJeIkZR71fPw1A"/>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40"></div>
+  </div>
+  <div class="pointer-events-none absolute -left-48 top-0 h-96 w-96 rounded-full bg-brand-lime/15 blur-[140px]"></div>
+  <div class="pointer-events-none absolute -right-36 top-1/4 h-96 w-96 rounded-full bg-secondary/15 blur-[140px]"></div>
+
+  <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-8">
+
+      <!-- Left column -->
+      <div class="flex flex-col items-start lg:col-span-7">
+        <div class="mb-6 inline-flex items-center gap-2.5 rounded-full border border-primary/30 bg-slate-800/80 px-4 py-1.5 shadow-glow-lime backdrop-blur-md">
+          <span class="h-2.5 w-2.5 rounded-full bg-primary animate-ping"></span>
+          <span class="h-2.5 w-2.5 -ml-5 rounded-full bg-primary"></span>
+          <span class="font-label-md text-label-md text-primary tracking-widest uppercase">SISTEMA OFICIAL · CIRCUITO 2026</span>
+        </div>
+
+        <h1 class="font-headline-xl text-headline-xl tracking-tight text-white uppercase italic sm:text-[68px] sm:leading-[1.05]">
+          DONDE NACE<br/>
+          <span class="text-primary drop-shadow-[0_0_35px_rgba(163,230,53,0.4)]">LA COMPETENCIA</span><br/>
+          REAL.
+        </h1>
+
+        <p class="mt-6 max-w-xl font-body-lg text-body-lg text-slate-200 leading-relaxed drop-shadow-sm">
+          La plataforma definitiva de pádel: inscripciones a torneos, ligas competitivas, estadísticas y marcador digital profesional en pista en tiempo real.
+        </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3.5">
+          <a class="inline-flex h-13 items-center justify-center gap-2.5 rounded-xl bg-primary px-6 font-label-lg text-label-lg text-on-primary shadow-glow-lime transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]" href="torneos.html">
+            <span class="material-symbols-outlined text-xl">emoji_events</span>
+            <span>Explorar Torneos</span>
+            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+          </a>
+          <a class="inline-flex h-13 items-center justify-center gap-2 rounded-xl border border-slate-700/80 bg-slate-800/90 backdrop-blur-md px-5 font-label-lg text-label-lg text-white transition-all duration-200 hover:border-brand-lime hover:text-primary" href="ligas.html">
+            <span class="material-symbols-outlined text-lg">leaderboard</span>
+            <span>Ligas Activas</span>
+          </a>
+          <a class="inline-flex h-13 items-center justify-center gap-2 rounded-xl border border-slate-700/80 bg-slate-800/90 backdrop-blur-md px-5 font-label-lg text-label-lg text-white transition-all duration-200 hover:bg-slate-700 group" href="vivo.html">
+            <span class="h-2.5 w-2.5 rounded-full bg-error animate-pulse"></span>
+            <span>Marcador en Vivo</span>
+          </a>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 backdrop-blur-md">
+          <div class="flex items-center gap-3">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary"><span class="material-symbols-outlined text-2xl">groups</span></div>
+            <div>
+              <p class="font-headline-md text-headline-md text-white font-bold">1.200+</p>
+              <p class="font-label-sm text-label-sm uppercase text-slate-400">Jugadores Registrados</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-slate-800/80 pt-3 sm:pt-0 sm:pl-4">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary/15 text-secondary"><span class="material-symbols-outlined text-2xl">live_tv</span></div>
+            <div>
+              <p class="font-headline-md text-headline-md text-white font-bold">4 Pistas</p>
+              <p class="font-label-sm text-label-sm uppercase text-slate-400">Marcador TV en Vivo</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 border-t sm:border-t-0 sm:border-l border-slate-800/80 pt-3 sm:pt-0 sm:pl-4">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-surface-container-highest text-tertiary"><span class="material-symbols-outlined text-2xl">workspace_premium</span></div>
+            <div>
+              <p class="font-headline-md text-headline-md text-white font-bold">32 Torneos</p>
+              <p class="font-label-sm text-label-sm uppercase text-slate-400">Calendario Anual</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Live Scoreboard Widget -->
+      <div class="relative lg:col-span-5">
+        <div class="relative overflow-hidden rounded-2xl border border-slate-700/60 bg-surface-container/90 backdrop-blur-xl p-6 shadow-2xl drop-shadow-[0_15px_35px_rgba(0,0,0,0.6)]">
+          <div class="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary/15 blur-[60px]"></div>
+          <!-- Widget Header -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-800/80 relative z-10">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="rounded bg-error px-2 py-0.5 font-label-sm text-label-sm text-on-error font-bold tracking-wide">PISTA 1 • CENTRAL</span>
+              <span class="font-label-md text-label-md text-slate-300">FINAL MASTER 2026</span>
+            </div>
+            <span class="font-label-sm text-label-sm uppercase text-primary tracking-widest flex items-center gap-1.5 font-bold">
+              <span class="h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+              <span class="material-symbols-outlined text-xs">broadcast_on_home</span> EN DIRECTO
+            </span>
+          </div>
+          <!-- Scores -->
+          <div class="space-y-3 mt-4 relative z-10">
+            <div class="flex items-center justify-between rounded-xl border border-primary/30 bg-surface-container-high/90 p-4 shadow-sm">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="h-3 w-3 rounded-full bg-primary shadow-glow-lime flex-shrink-0"></span>
+                <div class="min-w-0">
+                  <h4 class="font-headline-md text-headline-md uppercase text-white font-bold truncate">G. Belasteguín / A. Coello</h4>
+                  <span class="font-label-sm text-label-sm text-primary flex items-center gap-1 font-semibold">
+                    <span class="material-symbols-outlined text-xs">sports_tennis</span> AL SAQUE
+                  </span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 font-headline-lg text-headline-lg flex-shrink-0">
+                <span class="flex h-10 w-8 items-center justify-center rounded-lg bg-surface-container-highest text-white font-bold">6</span>
+                <span class="flex h-10 w-8 items-center justify-center rounded-lg bg-surface-container-highest text-white font-bold">4</span>
+                <span class="flex h-10 w-11 items-center justify-center rounded-lg bg-primary text-on-primary font-black shadow-glow-lime">40</span>
+              </div>
+            </div>
+            <div class="flex items-center justify-between rounded-xl border border-slate-800/80 bg-surface-container-low/90 p-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="h-3 w-3 rounded-full bg-surface-container-highest flex-shrink-0"></span>
+                <div class="min-w-0">
+                  <h4 class="font-headline-md text-headline-md uppercase text-slate-300 font-semibold truncate">J. Lebrón / A. Galán</h4>
+                  <span class="font-label-sm text-label-sm text-slate-400">RESTADOR</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 font-headline-lg text-headline-lg text-on-surface-variant flex-shrink-0">
+                <span class="flex h-10 w-8 items-center justify-center rounded-lg bg-surface-container-highest font-bold text-slate-200">4</span>
+                <span class="flex h-10 w-8 items-center justify-center rounded-lg bg-surface-container-highest font-bold text-slate-200">6</span>
+                <span class="flex h-10 w-11 items-center justify-center rounded-lg bg-secondary text-on-secondary font-black">30</span>
+              </div>
+            </div>
+          </div>
+          <!-- Match Telemetry -->
+          <div class="mt-4 flex items-center justify-between rounded-xl bg-surface-container-lowest/90 px-4 py-2.5 border border-slate-800/60 relative z-10 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-base">timer</span>
+              <span class="font-label-sm text-label-sm text-slate-300 font-semibold">TIEMPO: 01:42:18</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400 font-label-sm text-label-sm">
+              <span class="text-primary font-bold">PUNTOS DE ORO: 3</span>
+              <span class="text-white font-bold">SETS: 1 - 1</span>
+            </div>
+          </div>
+          <!-- Widget Actions -->
+          <div class="mt-5 grid grid-cols-2 gap-3 relative z-10">
+            <a class="flex items-center justify-center gap-2 rounded-xl bg-surface-container-highest py-2.5 font-label-md text-label-md text-white hover:bg-surface-bright transition-colors" href="vivo.html">
+              <span class="material-symbols-outlined text-sm text-primary">bar_chart</span> Estadísticas Pista
+            </a>
+            <a class="flex items-center justify-center gap-2 rounded-xl border border-primary/40 bg-primary/20 py-2.5 font-label-md text-label-md text-primary hover:bg-primary/30 transition-colors shadow-sm" href="vivo.html">
+              <span class="material-symbols-outlined text-sm">fullscreen</span> Pantalla Completa
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SPONSORS ─── -->
+<section class="w-full bg-surface-container-lowest py-8">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col items-center justify-between gap-6 md:flex-row">
+      <span class="font-label-md text-label-md uppercase tracking-widest text-outline">SPONSORS &amp; SEDES OFICIALES:</span>
+      <div class="flex flex-wrap items-center justify-center gap-8 md:gap-14">
+        <span class="font-headline-lg text-headline-lg tracking-tighter text-outline hover:text-white transition-colors cursor-pointer">BABOLAT</span>
+        <span class="font-headline-lg text-headline-lg tracking-tighter text-outline hover:text-white transition-colors cursor-pointer">CUPRA</span>
+        <span class="font-headline-lg text-headline-lg tracking-tighter text-outline hover:text-white transition-colors cursor-pointer">HEAD</span>
+        <div class="flex items-center gap-2 text-primary font-headline-md text-headline-md tracking-wider uppercase">
+          <span class="material-symbols-outlined text-primary text-xl">location_on</span>
+          <span>SAN MIGUEL PÁDEL CLUB</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MODALIDADES / QUICK ACCESS ─── -->
+<section class="w-full py-20" id="torneos-seccion">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-wider text-primary">ECOSISTEMA PADELHUB</span>
+        <h2 class="mt-2 font-headline-xl text-headline-xl text-white uppercase italic">MODALIDADES DE COMPETENCIA</h2>
+      </div>
+      <p class="max-w-md font-body-md text-body-md text-on-surface-variant">
+        Estructura deportiva homologada con fiscalización reglamentaria, streaming de pistas centrales y clasificación en vivo.
+      </p>
+    </div>
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Card: Torneos -->
+      <div class="group relative flex flex-col justify-between rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5">
+        <div>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container-highest text-primary"><span class="material-symbols-outlined text-2xl">trophy</span></div>
+          <h3 class="mt-6 font-headline-lg text-headline-lg text-white uppercase">TORNEOS</h3>
+          <p class="mt-2.5 font-body-md text-body-md text-on-surface-variant">Competencias oficiales de fin de semana para todos los niveles: desde 3ª hasta 7ª categoría, suma y libres.</p>
+        </div>
+        <div class="mt-8 flex items-center justify-between pt-4">
+          <span class="font-label-sm text-label-sm text-outline">CUADROS ABIERTOS</span>
+          <a class="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container-high text-white transition-colors group-hover:bg-primary group-hover:text-on-primary" href="torneos.html"><span class="material-symbols-outlined text-base">arrow_forward</span></a>
+        </div>
+      </div>
+      <!-- Card: Ligas -->
+      <div class="group relative flex flex-col justify-between rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5">
+        <div>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20 text-primary"><span class="material-symbols-outlined text-2xl">insights</span></div>
+          <h3 class="mt-6 font-headline-lg text-headline-lg text-white uppercase">LIGAS REGULARES</h3>
+          <p class="mt-2.5 font-body-md text-body-md text-on-surface-variant">Sumá puntos en cada fecha, escalá en el ranking provincial y clasificá para la disputa del Master Final anual.</p>
+        </div>
+        <div class="mt-8 flex items-center justify-between pt-4">
+          <span class="font-label-sm text-label-sm text-outline">TABLAS ACTIVAS</span>
+          <a class="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container-high text-white transition-colors group-hover:bg-primary group-hover:text-on-primary" href="ligas.html"><span class="material-symbols-outlined text-base">arrow_forward</span></a>
+        </div>
+      </div>
+      <!-- Card: Marcador -->
+      <div class="group relative flex flex-col justify-between rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-secondary/10">
+        <div>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/20 text-secondary"><span class="material-symbols-outlined text-2xl">scoreboard</span></div>
+          <h3 class="mt-6 font-headline-lg text-headline-lg text-white uppercase">MARCADOR EN VIVO</h3>
+          <p class="mt-2.5 font-body-md text-body-md text-on-surface-variant">Seguimiento punto a punto en directo, visualización de games para TV de Pista y control arbitral interactivo.</p>
+        </div>
+        <div class="mt-8 flex items-center justify-between pt-4">
+          <span class="font-label-sm text-label-sm text-secondary flex items-center gap-1.5"><span class="h-2 w-2 rounded-full bg-secondary"></span> 4 PISTAS ONLINE</span>
+          <a class="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container-high text-white transition-colors group-hover:bg-secondary group-hover:text-on-secondary" href="marcador.html"><span class="material-symbols-outlined text-base">arrow_forward</span></a>
+        </div>
+      </div>
+      <!-- Card: Actividades -->
+      <div class="group relative flex flex-col justify-between rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-primary/5">
+        <div>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-container-highest text-tertiary"><span class="material-symbols-outlined text-2xl">sports_tennis</span></div>
+          <h3 class="mt-6 font-headline-lg text-headline-lg text-white uppercase">ACTIVIDADES</h3>
+          <p class="mt-2.5 font-body-md text-body-md text-on-surface-variant">Fechas especiales, clínicas de perfeccionamiento táctico, campus de entrenamiento y partidos de exhibición.</p>
+        </div>
+        <div class="mt-8 flex items-center justify-between pt-4">
+          <span class="font-label-sm text-label-sm text-outline">CALENDARIO ABIERTO</span>
+          <a class="flex h-9 w-9 items-center justify-center rounded-lg bg-surface-container-high text-white transition-colors group-hover:bg-primary group-hover:text-on-primary" href="torneos.html"><span class="material-symbols-outlined text-base">arrow_forward</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ACTIVIDADES DESTACADAS (Dynamic) ─── -->
+<section class="w-full py-16" id="actividades-seccion">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-wider text-primary">PRÓXIMA GRAN FECHA</span>
+        <h2 class="mt-1 font-headline-xl text-headline-xl text-white uppercase italic">Actividades destacadas</h2>
+      </div>
+      <a class="hidden sm:inline-flex items-center gap-2 font-label-lg text-label-lg text-primary hover:underline" href="torneos.html">
+        <span>Ver agenda completa</span>
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    </div>
+    <div id="actividades" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="rounded-2xl bg-surface-container p-6 animate-pulse"><div class="h-4 w-32 bg-surface-container-high rounded mb-4"></div><div class="h-6 w-48 bg-surface-container-high rounded mb-2"></div><div class="h-4 w-36 bg-surface-container-high rounded"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHATSAPP CTA ─── -->
+<section class="w-full py-12" id="inscripcion">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="relative overflow-hidden rounded-3xl bg-surface-container-high p-8 sm:p-12 lg:p-16">
+      <div class="pointer-events-none absolute -right-20 -top-20 h-80 w-80 rounded-full bg-primary/10 blur-[100px]"></div>
+      <div class="pointer-events-none absolute right-12 bottom-6 text-surface-container-highest/20">
+        <div class="flex flex-col items-center justify-center text-primary/10 select-none"><span class="material-symbols-outlined text-[180px] leading-none">sports_tennis</span></div>
+      </div>
+      <div class="relative z-10 max-w-2xl">
+        <span class="font-label-md text-label-md uppercase tracking-wider text-primary">INSCRIPCIONES ABIERTAS</span>
+        <h2 class="mt-3 font-headline-xl text-headline-xl text-white uppercase italic sm:text-[44px]">Tu próxima competencia empieza acá.</h2>
+        <p class="mt-4 font-body-lg text-body-lg text-on-surface-variant">
+          Elegí tu categoría, confirmá el lugar de tu pareja y preparate para competir con fiscalización oficial y transmisión en streaming. Cupos limitados por cuadro.
+        </p>
+        <div class="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <a id="btn-band-wa" class="inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-primary px-8 font-headline-md text-headline-md text-on-primary shadow-glow-lime transition-all duration-200 hover:scale-[1.03] active:scale-[0.98]" href="https://wa.me/3854413049" target="_blank" rel="noopener noreferrer">
+            <span class="material-symbols-outlined text-2xl font-bold">send</span>
+            <span>Inscribirme por WhatsApp →</span>
+          </a>
+          <div class="flex items-center gap-3 px-2 text-on-surface-variant">
+            <span class="material-symbols-outlined text-primary text-xl">verified</span>
+            <span class="font-label-sm text-label-sm uppercase tracking-wide">Atención inmediata de coordinadores oficiales</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── LIGAS EN CURSO (Dynamic) ─── -->
+<section class="w-full py-16" id="ligas-seccion">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-wider text-secondary">COMPETENCIA ACTIVA</span>
+        <h2 class="mt-1 font-headline-xl text-headline-xl text-white uppercase italic">Ligas destacadas</h2>
+      </div>
+      <a class="hidden sm:inline-flex items-center gap-2 font-label-lg text-label-lg text-primary hover:underline" href="ligas.html">
+        <span>Ver todas las ligas</span>
+        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+      </a>
+    </div>
+    <div id="ligas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="rounded-2xl bg-surface-container p-6 animate-pulse"><div class="h-4 w-20 bg-surface-container-high rounded mb-4"></div><div class="h-6 w-36 bg-surface-container-high rounded mb-2"></div><div class="h-4 w-40 bg-surface-container-high rounded"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NOTICIAS (Dynamic) ─── -->
+<section class="w-full py-16 bg-surface-container-lowest">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-10">
+      <div>
+        <span class="font-label-md text-label-md uppercase tracking-wider text-primary">ACTUALIDAD PADELHUB</span>
+        <h2 class="mt-1 font-headline-xl text-headline-xl text-white uppercase italic">Noticias destacadas</h2>
+      </div>
+      <span class="font-label-md text-label-md text-outline">Todo lo que pasa en el circuito</span>
+    </div>
+    <div id="noticias" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- News Card 1 (static fallback) -->
+      <article class="flex flex-col overflow-hidden rounded-2xl bg-surface-container">
+        <div class="h-48 w-full overflow-hidden">
+          <img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt="Celebración de partido de pádel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtJKEdzVvstdH7utfvT2oXGNr7rjO-i1MvlfoJcS3c0Em1wZzSk41_y_i1g4MIz33OH6lx_-UpxFz3KSKenrsTTr9LSrzU-nLzaVtycL7tIbSY0bSQbnJrUAFogDxqkL-4sUtn3SCy3U0pXe9brUoFZEFknF_C6TsjiWTS7HbzUENr4AxSKmiW4KxkbI_Nrgv4CS64snfHjePDPaBXKKS9qrfeWl8DDnfzNAzpyLs"/>
+        </div>
+        <div class="flex flex-col flex-1 justify-between p-6">
+          <div>
+            <span class="font-label-sm text-label-sm text-primary uppercase">ACTUALIDAD PADELHUB</span>
+            <h3 class="mt-2 font-headline-md text-headline-md text-white uppercase">Finales con sello PadelHub</h3>
+            <p class="mt-2 font-body-md text-body-md text-on-surface-variant line-clamp-2">Campeones, partidazos y finales cargadas de intensidad en la última jornada de competencia.</p>
+          </div>
+          <span class="mt-6 font-label-sm text-label-sm text-outline">Sede Frías</span>
+        </div>
+      </article>
+      <!-- News Card 2 (static fallback) -->
+      <article class="flex flex-col overflow-hidden rounded-2xl bg-surface-container">
+        <div class="h-48 w-full overflow-hidden">
+          <img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt="Cancha de pádel profesional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTArX4wid5BekVFkjedxa0ayrROv3JXzjfgJd4NI02B2dLEggeNJ927fD90NEtic0GiG352pcfPf4-M0ix9PqVGpeolFIU439hGzbFkuuH1reCxlGgBA-aX8ExGFVDMikk3NqPTuk8Ce-IrYxNHBpuIVVpjbZkkZJ9Om_OcOzaxMTp7p37zNC23a16Mk1Jwmj32KzSJJFS5ttHQZRtGlL-wUHfyQ_YO-IwKioxGCk"/>
+        </div>
+        <div class="flex flex-col flex-1 justify-between p-6">
+          <div>
+            <span class="font-label-sm text-label-sm text-secondary uppercase">SISTEMA Y REGLAMENTO</span>
+            <h3 class="mt-2 font-headline-md text-headline-md text-white uppercase">Nuevo sistema de Marcador Digital en Vivo</h3>
+            <p class="mt-2 font-body-md text-body-md text-on-surface-variant line-clamp-2">Todas las pistas contarán con pantallas y control de tanteo interactivo para que sigas el minuto a minuto.</p>
+          </div>
+          <span class="mt-6 font-label-sm text-label-sm text-outline">Oficial</span>
+        </div>
+      </article>
+      <!-- News Card 3 (static fallback) -->
+      <article class="flex flex-col overflow-hidden rounded-2xl bg-surface-container">
+        <div class="h-48 w-full overflow-hidden">
+          <img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt="Acción de pádel smash" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIBUnyk1DJvJ7qU-RFdeAu9zFcmt68-9JEwSyjkbJ0mt5GdlWxnJlB4CoCpn12lm5Zr2OJDpvLAVRQrpcmnEK0Co82PoWpgN4c86SI-QCTGq7iXUZ1_QRmS0DnxjgKLeW3QiKVFrNtIipMrHIrNJzht9d1lqTt1NZ4DRvwjguGbcPLen-H3RU0AqiIw6Gxiudv1-St1LrBbpq5-JtKgIiyyGSH5q2IBLL_ysFeBZQ"/>
+        </div>
+        <div class="flex flex-col flex-1 justify-between p-6">
+          <div>
+            <span class="font-label-sm text-label-sm text-tertiary uppercase">RANKING PROVINCIAL</span>
+            <h3 class="mt-2 font-headline-md text-headline-md text-white uppercase">Actualización de Tablas de Puntos PadelHub 2026</h3>
+            <p class="mt-2 font-body-md text-body-md text-on-surface-variant line-clamp-2">Conocé la tabla general tras disputarse los primeros tres torneos de la temporada oficial.</p>
+          </div>
+          <span class="mt-6 font-label-sm text-label-sm text-outline">Clasificación</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER INFO STRIP ─── -->
+<section class="w-full py-12 bg-surface-container-high/40">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h4 class="font-headline-md text-headline-md text-white uppercase tracking-tight flex items-center gap-2">
+          <span class="text-primary">Padel</span>Hub
+        </h4>
+        <p class="mt-3 font-body-md text-body-md text-on-surface-variant">Competencia, tecnología y organización en una experiencia pensada para quienes viven el pádel en serio.</p>
+      </div>
+      <div>
+        <h4 class="font-label-lg text-label-lg uppercase tracking-wider text-outline">NAVEGACIÓN</h4>
+        <ul class="mt-3 space-y-2 font-body-md text-body-md text-on-surface">
+          <li><a class="hover:text-primary transition-colors" href="torneos.html">Torneos oficiales</a></li>
+          <li><a class="hover:text-primary transition-colors" href="ligas.html">Ligas y Puntuaciones</a></li>
+          <li><a class="hover:text-primary transition-colors" href="vivo.html">Marcador en vivo</a></li>
+          <li><a class="hover:text-primary transition-colors" href="torneos.html">Agenda y Horarios</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-label-lg text-label-lg uppercase tracking-wider text-outline">CONTACTO &amp; INSCRIPCIONES</h4>
+        <div class="mt-3 space-y-2 font-body-md text-body-md text-on-surface">
+          <a id="footer-wa-link" href="https://wa.me/3854413049" target="_blank" rel="noopener" class="text-primary font-bold flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-sm">chat</span> WhatsApp Oficial
+          </a>
+          <p class="text-on-surface-variant">San Miguel Pádel Club · Frías</p>
+          <a href="mailto:padelprofrias@gmail.com" class="text-outline hover:text-white transition-colors">padelprofrias@gmail.com</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="font-label-lg text-label-lg uppercase tracking-wider text-outline">ADMINISTRACIÓN</h4>
+        <p class="mt-3 font-body-md text-body-md text-on-surface-variant">Acceso restringido para organizadores y directores de torneo:</p>
+        <a class="mt-3 inline-flex items-center gap-2 font-label-md text-label-md text-outline hover:text-primary hover:underline transition-colors" href="admin.html">
+          <span class="material-symbols-outlined text-sm">shield</span>
+          <span>Acceso Admin</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer class="border-t border-slate-800/80 bg-slate-950 text-slate-500 text-xs py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2"><span class="font-bold text-slate-300">PadelHub</span><span>·</span><span>Sistema y Circuito Oficial de Pádel © 2026</span></div>
+    <div class="flex items-center gap-6">
+      <a class="hover:text-slate-300 transition-colors" href="torneos.html">Torneos</a>
+      <a class="hover:text-slate-300 transition-colors" href="ligas.html">Ligas</a>
+      <a class="hover:text-slate-300 transition-colors" href="vivo.html">Marcador en Vivo</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════ SCRIPTS ═══════════════ -->
+<script src="js/firebase-config.js"></script>
+<script src="js/procup-data.js"></script>
+<script>
+  // Init Lucide Icons
+  lucide.createIcons();
+
+  // ─── Dynamic Data from Firebase ───
+  ProcupData.loadAll().then(function (data) {
+    var cfg = data.config || {};
+    var waNum = cfg.whatsappNumber || "3854413049";
+    var waMsg = cfg.whatsappMessage || "Hola, quiero información e inscribirme a la competencia en PadelHub";
+    var waUrl = ProcupData.buildWhatsappUrl(waNum, waMsg);
+
+    // Update WhatsApp links
+    var btnBand = document.getElementById("btn-band-wa");
+    if (btnBand) btnBand.href = waUrl;
+    var footerWa = document.getElementById("footer-wa-link");
+    if (footerWa) footerWa.href = waUrl;
+
+    // ─── Actividades ───
+    var actEl = document.getElementById("actividades");
+    var acts = data.actividades || [];
+    if (acts.length > 0) {
+      actEl.innerHTML = acts.map(function (a) {
+        return '<div class="group rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">' +
+          '<span class="rounded bg-primary/20 px-3 py-1 font-label-sm text-label-sm text-primary uppercase font-bold tracking-wider">' + (a.badge || 'Actividad') + '</span>' +
+          '<h3 class="mt-4 font-headline-md text-headline-md text-white uppercase">' + a.titulo + '</h3>' +
+          '<div class="mt-2 font-body-md text-body-md text-on-surface-variant flex items-center gap-2 flex-wrap">' +
+            '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary">calendar_month</span>' + (a.fecha || '') + '</span>' +
+            (a.lugar ? '<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm text-primary">location_on</span>' + a.lugar + '</span>' : '') +
+          '</div>' +
+          (a.link ? '<a href="' + a.link + '" class="mt-4 inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:underline"><span>Ver detalles</span><span class="material-symbols-outlined text-sm">arrow_forward</span></a>' : '') +
+        '</div>';
+      }).join('');
+    } else {
+      actEl.innerHTML = '<p class="text-on-surface-variant font-body-md text-body-md">Sin actividades publicadas por el momento.</p>';
+    }
+
+    // ─── Ligas ───
+    var ligasEl = document.getElementById("ligas");
+    var ligas = (data.ligas || []).slice(0, 4);
+    if (ligas.length > 0) {
+      ligasEl.innerHTML = ligas.map(function (l) {
+        var badge = l.estado === "EN_CURSO" ? "En curso" : l.estado === "INSCRIPCIONES" ? "Inscripciones" : "Finalizada";
+        var badgeColor = l.estado === "EN_CURSO" ? "bg-primary/20 text-primary" : l.estado === "INSCRIPCIONES" ? "bg-secondary/20 text-secondary" : "bg-surface-container-highest text-outline";
+        return '<a class="group rounded-2xl bg-surface-container p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-secondary/10 block" href="ligas.html?id=' + encodeURIComponent(l.id) + '">' +
+          '<span class="rounded px-3 py-1 font-label-sm text-label-sm uppercase font-bold tracking-wider ' + badgeColor + '">' + badge + '</span>' +
+          '<h3 class="mt-4 font-headline-md text-headline-md text-white uppercase">' + l.nombre + '</h3>' +
+          '<div class="mt-2 font-body-md text-body-md text-on-surface-variant">' + (l.categoria || '') + ' · ' + (l.rama || '') + '</div>' +
+          '<div class="mt-1 font-label-sm text-label-sm text-outline">' + (l.sede || '') + ' · ' + (l.temporada || '') + '</div>' +
+          '<div class="mt-4 flex items-center justify-end">' +
+            '<span class="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-container-high text-white transition-colors group-hover:bg-secondary group-hover:text-on-secondary"><span class="material-symbols-outlined text-sm">arrow_forward</span></span>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    } else {
+      ligasEl.innerHTML = '<p class="text-on-surface-variant font-body-md text-body-md">Sin ligas publicadas por el momento.</p>';
+    }
+
+    // ─── Noticias ───
+    var newsEl = document.getElementById("noticias");
+    var noticias = data.noticias || [];
+    if (noticias.length > 0) {
+      var imgs = [
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuCtJKEdzVvstdH7utfvT2oXGNr7rjO-i1MvlfoJcS3c0Em1wZzSk41_y_i1g4MIz33OH6lx_-UpxFz3KSKenrsTTr9LSrzU-nLzaVtycL7tIbSY0bSQbnJrUAFogDxqkL-4sUtn3SCy3U0pXe9brUoFZEFknF_C6TsjiWTS7HbzUENr4AxSKmiW4KxkbI_Nrgv4CS64snfHjePDPaBXKKS9qrfeWl8DDnfzNAzpyLs",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuDTArX4wid5BekVFkjedxa0ayrROv3JXzjfgJd4NI02B2dLEggeNJ927fD90NEtic0GiG352pcfPf4-M0ix9PqVGpeolFIU439hGzbFkuuH1reCxlGgBA-aX8ExGFVDMikk3NqPTuk8Ce-IrYxNHBpuIVVpjbZkkZJ9Om_OcOzaxMTp7p37zNC23a16Mk1Jwmj32KzSJJFS5ttHQZRtGlL-wUHfyQ_YO-IwKioxGCk",
+        "https://lh3.googleusercontent.com/aida-public/AB6AXuCIBUnyk1DJvJ7qU-RFdeAu9zFcmt68-9JEwSyjkbJ0mt5GdlWxnJlB4CoCpn12lm5Zr2OJDpvLAVRQrpcmnEK0Co82PoWpgN4c86SI-QCTGq7iXUZ1_QRmS0DnxjgKLeW3QiKVFrNtIipMrHIrNJzht9d1lqTt1NZ4DRvwjguGbcPLen-H3RU0AqiIw6Gxiudv1-St1LrBbpq5-JtKgIiyyGSH5q2IBLL_ysFeBZQ"
+      ];
+      var cats = ["ACTUALIDAD PADELHUB", "SISTEMA Y REGLAMENTO", "RANKING PROVINCIAL"];
+      var catColors = ["text-primary", "text-secondary", "text-tertiary"];
+      newsEl.innerHTML = noticias.slice(0, 3).map(function (n, i) {
+        return '<article class="flex flex-col overflow-hidden rounded-2xl bg-surface-container">' +
+          '<div class="h-48 w-full overflow-hidden">' +
+            '<img class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" alt="' + n.titulo + '" src="' + (n.imagen || imgs[i % 3]) + '"/>' +
+          '</div>' +
+          '<div class="flex flex-col flex-1 justify-between p-6">' +
+            '<div>' +
+              '<span class="font-label-sm text-label-sm ' + catColors[i % 3] + ' uppercase">' + cats[i % 3] + '</span>' +
+              '<h3 class="mt-2 font-headline-md text-headline-md text-white uppercase">' + n.titulo + '</h3>' +
+              '<p class="mt-2 font-body-md text-body-md text-on-surface-variant line-clamp-2">' + (n.extracto || '') + '</p>' +
+            '</div>' +
+            '<span class="mt-6 font-label-sm text-label-sm text-outline">' + (n.fecha || '') + '</span>' +
+          '</div>' +
+        '</article>';
+      }).join('');
+    }
+  });
+</script>
+</body>
+</html>

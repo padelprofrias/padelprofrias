@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — PadelHub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/hub.css">
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+<body class="hub">
+  <header id="hub-nav" class="hub-nav"></header>
+
+  <!-- PANTALLA DE LOGIN ADMINISTRADOR -->
+  <div id="admin-login-screen" class="admin-login-screen">
+    <div class="admin-login-card">
+      <h2><span style="color:var(--lime)">🔐</span> Acceso Administrador</h2>
+      <p class="desc">Ingreso restringido exclusivamente para administradores autorizados.</p>
+
+      <div id="login-error-alert" class="login-alert error">
+        Credenciales incorrectas. Verificá tu usuario y contraseña.
+      </div>
+
+      <form id="admin-login-form" onsubmit="AdminAuth.login(event)">
+        <div class="login-input-group">
+          <label for="login-user">Usuario</label>
+          <div class="login-input-wrap">
+            <input id="login-user" type="text" placeholder="Usuario administrador" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="login-input-group">
+          <label for="login-pass">Contraseña</label>
+          <div class="login-input-wrap">
+            <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" required>
+            <button type="button" class="toggle-pwd-btn" onclick="AdminAuth.togglePassword()" title="Ver contraseña" aria-label="Ver contraseña">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login">Ingresar al Panel</button>
+      </form>
+
+      <a class="forgot-pwd-link" onclick="AdminAuth.showRecoveryModal()">¿Olvidaste tu contraseña? / Recuperar acceso</a>
+    </div>
+  </div>
+
+  <!-- MODAL RECUPERACIÓN DE CONTRASEÑA -->
+  <div id="recovery-modal" class="recovery-modal" onclick="if(event.target===this) AdminAuth.hideRecoveryModal()">
+    <div class="recovery-box">
+      <h3>Recuperar contraseña</h3>
+      <p>Para restablecer tu acceso o solicitar tus credenciales, comunicate directamente con la casilla administradora oficial:</p>
+      
+      <div class="recovery-email-badge">
+        <span id="admin-email-text">padelprofrias@gmail.com</span>
+        <button class="btn btn-ghost" style="padding:0.3rem 0.6rem;font-size:0.75rem" type="button" onclick="AdminAuth.copyAdminEmail()">Copiar</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <a id="btn-email-mailto" class="btn btn-lime" href="mailto:padelprofrias@gmail.com?subject=Recuperaci%C3%B3n%20de%20Contrase%C3%B1a%20-%20PadelHub&body=Hola,%20solicito%20la%20recuperaci%C3%B3n%20de%20mi%20contrase%C3%B1a%20para%20el%20panel%20de%20administraci%C3%B3n%20de%20PadelHub.">
+          ✉️ Enviar e-mail a padelprofrias@gmail.com
+        </a>
+        <button class="btn btn-ghost" type="button" onclick="AdminAuth.hideRecoveryModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO DEL PANEL ADMIN (PROTEGIDO) -->
+  <main id="admin-main-wrap" class="hub-wrap" style="padding-top:1.5rem;max-width:960px;display:none">
+    
+    <div class="admin-header-bar">
+      <div>
+        <h1 style="font-size:1.6rem;font-weight:900;margin:0">Panel de administración PadelHub</h1>
+        <p id="fb-status" style="font-size:0.8rem;margin:0.25rem 0 0"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <span style="font-size:0.8rem;color:#94a3b8;background:#1e293b;padding:0.35rem 0.75rem;border-radius:999px">👤 Admin</span>
+        <button class="btn btn-ghost" type="button" onclick="AdminAuth.logout()" style="font-size:0.78rem;padding:0.4rem 0.8rem">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="filters" id="tabs">
+      <button class="on" data-tab="torneos">Torneos</button>
+      <button data-tab="ligas">Ligas</button>
+      <button data-tab="marcador">⚖️ Árbitros & Marcador</button>
+      <button data-tab="sponsors">🤝 Sponsors & Publicidad</button>
+      <button data-tab="whatsapp">📱 WhatsApp & Inscripciones</button>
+      <button data-tab="noticias">Noticias</button>
+      <button data-tab="actividades">Actividades</button>
+      <button data-tab="sistema">Sistema</button>
+    </div>
+
+    <!-- ÁRBITROS & MARCADOR EN VIVO -->
+    <section id="tab-marcador" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">⚖️ Control Arbitral & Acceso al Marcador</h3>
+        <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 1rem">
+          Configurá el acceso para que los árbitros de pista puedan abrir <code>marcador.html</code> y marcar los puntos en vivo. Los resultados se transmiten automáticamente en tiempo real al público en <code>vivo.html</code>.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.75rem">
+          <div>
+            <label for="cfg-ref-user">Usuario para Árbitros</label>
+            <input id="cfg-ref-user" value="Admin" placeholder="Admin">
+          </div>
+          <div>
+            <label for="cfg-ref-pass">Contraseña para Árbitros</label>
+            <input id="cfg-ref-pass" value="Admin" placeholder="Admin">
+          </div>
+        </div>
+
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1.25rem">
+          <button class="btn btn-lime" type="button" onclick="Admin.saveRefereeConfig()">💾 Guardar credenciales de árbitros</button>
+          <a class="btn btn-ghost" href="marcador.html?auth=admin" target="_blank">📱 Abrir Consola Arbitral (marcador.html) ➔</a>
+          <a class="btn btn-ghost" href="vivo.html" target="_blank" style="color:#38bdf8">📺 Ver Transmisión en Vivo (vivo.html) ➔</a>
+        </div>
+      </div>
+
+      <div class="hub-card" style="margin-bottom:1rem">
+        <h4 style="margin:0 0 0.5rem;color:#cbd5e1">🎾 Partidos Programados para Arbitrar</h4>
+        <p style="color:#94a3b8;font-size:0.8rem;margin:0 0 1rem">
+          Hacé clic en cualquier partido para abrir directamente la consola arbitral con los nombres y cancha pre-cargados.
+        </p>
+        <div id="list-referee-matches"></div>
+      </div>
+    </section>
+
+    <!-- WHATSAPP & INSCRIPCIONES -->
+    <section id="tab-whatsapp" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">📱 WhatsApp Oficial para Inscripciones</h3>
+        <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 1rem">
+          Este número es la fuente central a donde se dirigirán todos los botones "INSCRIBIRME POR WHATSAPP" en torneos.html, ligas.html y el sitio público.
+        </p>
+
+        <label for="cfg-wa-num">Número de WhatsApp (con o sin prefijo de país)</label>
+        <input id="cfg-wa-num" value="3854413049" placeholder="Ej: 3854413049 o 5493854413049">
+        <small style="color:#64748b;font-size:0.75rem;display:block;margin-top:0.3rem">Ejemplo: 3854413049 (Frías / Santiago del Estero)</small>
+
+        <label for="cfg-wa-msg" style="margin-top:0.9rem">Mensaje predeterminado de inscripción</label>
+        <input id="cfg-wa-msg" value="Hola, quiero información e inscribirme a la competencia en PadelHub" placeholder="Hola, quiero inscribirme a la competencia en PadelHub">
+
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1.25rem">
+          <button class="btn btn-lime" type="button" onclick="Admin.saveWhatsappConfig()">💾 Guardar número de WhatsApp</button>
+          <button class="btn btn-ghost" type="button" onclick="Admin.testWhatsappLink()">📲 Probar enlace WhatsApp</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPONSORS & PUBLICIDAD -->
+    <section id="tab-sponsors" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">＋ Agregar Sponsor / Marca Promocional</h3>
+        <p style="color:#94a3b8;font-size:0.85rem;margin:0 0 1rem">
+          Publicá sponsors oficiales, marcas de paletas, indumentaria o complejos con fotos, logos y videos promocionales. Se verán reflejados en todo el sistema.
+        </p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.75rem">
+          <div>
+            <label>Nombre de la marca o sponsor *</label>
+            <input id="sp-nombre" placeholder="Ej: Babolat Pádel / San Miguel Club">
+          </div>
+          <div>
+            <label>Tipo / Nivel</label>
+            <select id="sp-tipo">
+              <option value="Sponsor Oficial">Sponsor Oficial</option>
+              <option value="Sponsor Platino">Sponsor Platino</option>
+              <option value="Sponsor Oro">Sponsor Oro</option>
+              <option value="Sede Central">Sede Central</option>
+              <option value="Indumentaria Oficial">Indumentaria Oficial</option>
+              <option value="Media Partner">Media Partner</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Subtítulo o Categoría de patrocinio</label>
+            <input id="sp-cat" placeholder="Ej: Paletas Oficiales / Hidratación Oficial">
+          </div>
+          <div>
+            <label>Enlace web / Red social / WhatsApp</label>
+            <input id="sp-link" placeholder="https://instagram.com/... o https://...">
+          </div>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Logo o Foto Promocional (URL o subir archivo)</label>
+          <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+            <input id="sp-logo" style="flex:1;min-width:200px" placeholder="https://... URL de la imagen o logo">
+            <label class="btn btn-ghost" style="margin:0;cursor:pointer;font-size:0.8rem;padding:0.45rem 0.8rem">
+              📁 Subir foto
+              <input type="file" accept="image/*" style="display:none" onchange="Admin.handleSponsorFileUpload(event)">
+            </label>
+          </div>
+          <div id="sp-logo-preview" style="margin-top:0.5rem;display:none">
+            <img id="sp-logo-img" src="" alt="Preview" style="max-height:60px;max-width:140px;border-radius:6px;border:1px solid #334155;object-fit:cover;background:#0f172a;padding:2px">
+          </div>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Video Promocional (URL YouTube, Vimeo o MP4)</label>
+          <input id="sp-video" placeholder="https://www.youtube.com/watch?v=... o link a video promocional">
+          <small style="color:#64748b;font-size:0.72rem">Opcional: Si colocás un video, se mostrará el reproductor o botón de ver spot.</small>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Descripción corta o promoción especial</label>
+          <input id="sp-desc" placeholder="Ej: 15% de descuento en paletas para jugadores del torneo con código PADELHUB">
+        </div>
+
+        <p style="margin:1.25rem 0 0">
+          <button class="btn btn-lime" type="button" onclick="Admin.addSponsor()">💾 Publicar Sponsor</button>
+        </p>
+      </div>
+
+      <h4 style="margin:1.5rem 0 0.5rem;color:#cbd5e1">Sponsors Activos en el Sistema</h4>
+      <div id="list-sponsors" class="hub-grid"></div>
+    </section>
+
+    <!-- TORNEOS -->
+    <section id="tab-torneos" class="tab-panel">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">＋ Publicar Torneo / Fecha Especial</h3>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.75rem">
+          <div>
+            <label>Nombre del torneo *</label>
+            <input id="t-nombre" placeholder="Open San Miguel Pádel 2026">
+          </div>
+          <div>
+            <label>Subtítulo / Copa</label>
+            <input id="t-sub" placeholder="Copa Babolat & Circuito Pro">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Fechas</label>
+            <input id="t-fecha" placeholder="24, 25 y 26 de Abril 2026">
+          </div>
+          <div>
+            <label>Sede / Lugar</label>
+            <input id="t-lugar" placeholder="San Miguel Pádel Club • Frías">
+          </div>
+          <div>
+            <label>Estado</label>
+            <select id="t-estado">
+              <option value="INSCRIPCIONES">Inscripciones Abiertas</option>
+              <option value="EN_JUEGO">En Juego (En Vivo)</option>
+              <option value="PROXIMO">Próximamente</option>
+              <option value="FINALIZADO">Finalizado</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Badge de tarjeta</label>
+            <input id="t-badge" value="Inscripciones Abiertas">
+          </div>
+          <div>
+            <label>Categorías (separadas por coma)</label>
+            <input id="t-cats" placeholder="3ª, 4ª, 5ª, 6ª, 7ª, Suma 11, Damas">
+          </div>
+          <div>
+            <label>Bolsa de premios / Pozo</label>
+            <input id="t-bolsa" placeholder="$1.500.000 en Efectivo">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Cupos confirmados</label>
+            <input id="t-cupos-conf" type="number" value="12" placeholder="12">
+          </div>
+          <div>
+            <label>Cupos totales</label>
+            <input id="t-cupos-tot" type="number" value="16" placeholder="16">
+          </div>
+          <div style="display:flex;align-items:center;padding-top:1.5rem">
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-weight:700;color:var(--lime);font-size:0.85rem">
+              <input type="checkbox" id="t-destacado" style="width:1.1rem;height:1.1rem">
+              ★ Evento Estelar (Banner Destacado)
+            </label>
+          </div>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <label>Imagen de portada (opcional)</label>
+          <input id="t-img" placeholder="https://... URL de foto de portada">
+        </div>
+
+        <!-- Opciones para En Juego o Finalizado -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.75rem;margin-top:0.75rem">
+          <div>
+            <label>Fase actual o Cancha (para En Juego)</label>
+            <input id="t-fase" placeholder="Semifinal Central • Cancha 1">
+          </div>
+          <div>
+            <label>Campeones (si está finalizado)</label>
+            <input id="t-campeones" placeholder="López / Martínez (6-4, 7-5 vs Díaz / Pereyra)">
+          </div>
+        </div>
+
+        <div style="margin-top:0.75rem">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <label style="margin:0">WhatsApp de Inscripción</label>
+            <button type="button" onclick="Admin.fillDefaultWhatsapp('t-wa')" style="background:none;border:none;color:var(--lime);font-size:0.75rem;cursor:pointer;font-weight:700">Usar WhatsApp oficial</button>
+          </div>
+          <input id="t-wa" placeholder="Dejá en blanco para usar automáticamente el número oficial guardado">
+        </div>
+
+        <p style="margin:1.25rem 0 0"><button class="btn btn-lime" type="button" onclick="Admin.addTorneo()">💾 Publicar torneo</button></p>
+      </div>
+
+      <h4 style="margin:1.5rem 0 0.5rem;color:#cbd5e1">Torneos Publicados</h4>
+      <div id="list-torneos"></div>
+    </section>
+
+    <!-- LIGAS -->
+    <section id="tab-ligas" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">＋ Nueva Liga Oficial</h3>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0.75rem">
+          <div>
+            <label>Nombre de la liga *</label>
+            <input id="l-nombre" placeholder="Liga 5ta Categoría - Apertura">
+          </div>
+          <div>
+            <label>Categoría</label>
+            <input id="l-cat" placeholder="5ª MASCULINA">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Rama</label>
+            <select id="l-rama"><option>MASCULINA</option><option>FEMENINA</option><option>MIXTA</option></select>
+          </div>
+          <div>
+            <label>Estado</label>
+            <select id="l-estado"><option value="EN_CURSO">EN_CURSO</option><option value="INSCRIPCIONES">INSCRIPCIONES</option><option value="FINALIZADA">FINALIZADA</option></select>
+          </div>
+          <div>
+            <label>Temporada</label>
+            <input id="l-temp" placeholder="2026 Apertura">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.75rem;margin-top:0.5rem">
+          <div>
+            <label>Sede Oficial</label>
+            <input id="l-sede" placeholder="San Miguel Pádel Club • Frías">
+          </div>
+          <div>
+            <label>Inscriptos / Parejas</label>
+            <input id="l-inscriptos" type="number" value="12" placeholder="12">
+          </div>
+          <div>
+            <label>Fase actual o fecha</label>
+            <input id="l-fase" placeholder="Fecha 4 / 7">
+          </div>
+        </div>
+
+        <div style="margin-top:0.5rem">
+          <label>Líderes de tabla (resumen)</label>
+          <input id="l-lideres" placeholder="Coronel / Gómez (15 pts)">
+        </div>
+
+        <div style="margin-top:0.5rem">
+          <label>Formato de competencia</label>
+          <input id="l-formato" placeholder="Todos contra todos · 2 sets + Super TB">
+        </div>
+
+        <p style="margin:1.25rem 0 0"><button class="btn btn-lime" type="button" onclick="Admin.addLiga()">💾 Crear liga</button></p>
+      </div>
+
+      <h4 style="margin:1.5rem 0 0.5rem;color:#cbd5e1">Ligas Activas en el Sistema</h4>
+      <div id="list-ligas"></div>
+    </section>
+
+    <!-- NOTICIAS -->
+    <section id="tab-noticias" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">＋ Nueva noticia</h3>
+        <label>Título</label><input id="n-titulo">
+        <label>Extracto</label><textarea id="n-extracto" rows="3"></textarea>
+        <label>Fecha</label><input id="n-fecha" type="date">
+        <p style="margin:1rem 0 0"><button class="btn btn-lime" type="button" onclick="Admin.addNoticia()">Publicar noticia</button></p>
+      </div>
+      <div id="list-noticias"></div>
+    </section>
+
+    <!-- ACTIVIDADES -->
+    <section id="tab-actividades" class="tab-panel" style="display:none">
+      <div class="hub-card admin-form" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">＋ Actividad destacada (home)</h3>
+        <label>Título</label><input id="a-titulo">
+        <label>Fecha</label><input id="a-fecha">
+        <label>Lugar</label><input id="a-lugar">
+        <label>Badge</label><input id="a-badge" value="Inscripciones Abiertas">
+        <label>Link</label><input id="a-link" placeholder="torneos.html o ligas.html?id=...">
+        <p style="margin:1rem 0 0"><button class="btn btn-lime" type="button" onclick="Admin.addActividad()">Publicar actividad</button></p>
+      </div>
+      <div id="list-actividades"></div>
+    </section>
+
+    <!-- SISTEMA -->
+    <section id="tab-sistema" class="tab-panel" style="display:none">
+      <div class="hub-card" style="margin-bottom:1rem">
+        <h3 style="margin-top:0">Datos & Base del Sistema</h3>
+        <p style="color:#94a3b8;font-size:0.85rem">
+          Los datos sincronizan en Firebase Realtime Database <code>procup/</code> y en localStorage local. Todos los cambios se reflejan inmediatamente en torneos.html y ligas.html.
+        </p>
+        <p style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem">
+          <button class="btn btn-ghost" type="button" onclick="Admin.seedDemo()">Restaurar datos oficiales PadelHub</button>
+          <button class="btn btn-ghost" type="button" onclick="Admin.exportJSON()">Exportar JSON</button>
+          <a class="btn btn-lime" href="torneos.html" target="_blank">Ver Torneos Públicos</a>
+          <a class="btn btn-lime" href="ligas.html" target="_blank">Ver Ligas Públicas</a>
+          <a class="btn btn-ghost" href="marcador.html" target="_blank">Ir al marcador</a>
+          <a class="btn btn-ghost" href="index.html" target="_blank">Ver hub público</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="hub-footer">PadelHub · Panel de Administración Oficial</footer>
+
+  <script src="js/firebase-config.js?v=5"></script>
+  <script src="js/procup-data.js?v=5"></script>
+  <script src="js/hub-nav.js?v=5"></script>
+  <script>
+    renderHubNav("admin.html");
+
+    // ---------- AUTENTICACIÓN ADMINISTRADOR ----------
+    const AdminAuth = (() => {
+      const SESSION_KEY = "padelhub_admin_logged";
+      const ADMIN_EMAIL = "padelprofrias@gmail.com";
+
+      function isLogged() {
+        return sessionStorage.getItem(SESSION_KEY) === "true";
+      }
+
+      function checkAccess() {
+        const loginScreen = document.getElementById("admin-login-screen");
+        const mainWrap = document.getElementById("admin-main-wrap");
+        if (isLogged()) {
+          loginScreen.style.display = "none";
+          mainWrap.style.display = "block";
+          Admin.init();
+        } else {
+          loginScreen.style.display = "flex";
+          mainWrap.style.display = "none";
+        }
+      }
+
+      function login(e) {
+        if (e) e.preventDefault();
+        const user = (document.getElementById("login-user").value || "").trim();
+        const pass = (document.getElementById("login-pass").value || "").trim();
+        const alertBox = document.getElementById("login-error-alert");
+
+        // Usuario: Admin (case-insensitive) · Contraseña: Admin (exacta)
+        if (user.toLowerCase() === "admin" && pass === "Admin") {
+          alertBox.style.display = "none";
+          sessionStorage.setItem(SESSION_KEY, "true");
+          checkAccess();
+        } else {
+          alertBox.style.display = "block";
+          alertBox.textContent = "Usuario o contraseña incorrectos. Solo para administradores.";
+          const passInput = document.getElementById("login-pass");
+          passInput.value = "";
+          passInput.focus();
+        }
+      }
+
+      function logout() {
+        if (confirm("¿Cerrar sesión de administrador?")) {
+          sessionStorage.removeItem(SESSION_KEY);
+          checkAccess();
+        }
+      }
+
+      function togglePassword() {
+        const input = document.getElementById("login-pass");
+        input.type = input.type === "password" ? "text" : "password";
+      }
+
+      function showRecoveryModal() {
+        document.getElementById("recovery-modal").classList.add("open");
+      }
+
+      function hideRecoveryModal() {
+        document.getElementById("recovery-modal").classList.remove("open");
+      }
+
+      function copyAdminEmail() {
+        navigator.clipboard.writeText(ADMIN_EMAIL).then(function () {
+          alert("Correo copiado: " + ADMIN_EMAIL);
+        }).catch(function () {
+          alert("E-mail administrador: " + ADMIN_EMAIL);
+        });
+      }
+
+      return {
+        checkAccess: checkAccess,
+        login: login,
+        logout: logout,
+        togglePassword: togglePassword,
+        showRecoveryModal: showRecoveryModal,
+        hideRecoveryModal: hideRecoveryModal,
+        copyAdminEmail: copyAdminEmail
+      };
+    })();
+
+    // ---------- CONTROLADOR DEL PANEL ----------
+    const Admin = (() => {
+      let data = { config: {}, ligas: [], torneos: [], sponsors: [], noticias: [], actividades: [] };
+
+      function status() {
+        const el = document.getElementById("fb-status");
+        if (!el) return;
+        el.textContent = ProcupData.fbReady()
+          ? "✓ Firebase activo — sincronización en la nube con todas las páginas"
+          : "Firebase no configurado — guardado local compartido";
+        el.style.color = ProcupData.fbReady() ? "#a3e635" : "#fbbf24";
+      }
+
+      function refresh() {
+        return ProcupData.loadAll().then(function (d) {
+          data = d;
+          renderLists();
+          renderConfig();
+        });
+      }
+
+      function renderConfig() {
+        const cfg = data.config || {};
+        const numInput = document.getElementById("cfg-wa-num");
+        const msgInput = document.getElementById("cfg-wa-msg");
+        if (numInput) numInput.value = cfg.whatsappNumber || "3854413049";
+        if (msgInput) msgInput.value = cfg.whatsappMessage || "Hola, quiero información e inscribirme a la competencia en PadelHub";
+
+        const refUser = document.getElementById("cfg-ref-user");
+        const refPass = document.getElementById("cfg-ref-pass");
+        if (refUser) refUser.value = cfg.refereeUser || "Admin";
+        if (refPass) refPass.value = cfg.refereePass || "Admin";
+      }
+
+      function saveRefereeConfig() {
+        const u = document.getElementById("cfg-ref-user").value.trim();
+        const p = document.getElementById("cfg-ref-pass").value.trim();
+        data.config = data.config || {};
+        data.config.refereeUser = u || "Admin";
+        data.config.refereePass = p || "Admin";
+        ProcupData.saveAll(data).then(function () {
+          alert("✓ Credenciales de árbitro guardadas (" + data.config.refereeUser + " / " + data.config.refereePass + ")");
+        });
+      }
+
+      function saveWhatsappConfig() {
+        const num = document.getElementById("cfg-wa-num").value.trim();
+        const msg = document.getElementById("cfg-wa-msg").value.trim();
+        data.config = data.config || {};
+        data.config.whatsappNumber = num || "3854413049";
+        data.config.whatsappMessage = msg;
+        ProcupData.saveAll(data).then(function () {
+          alert("✓ Número de WhatsApp de inscripción guardado. Se aplicará a todos los botones de torneos y ligas.");
+        });
+      }
+
+      function testWhatsappLink() {
+        const num = document.getElementById("cfg-wa-num").value.trim();
+        const msg = document.getElementById("cfg-wa-msg").value.trim();
+        const url = ProcupData.buildWhatsappUrl(num, msg);
+        window.open(url, "_blank");
+      }
+
+      function fillDefaultWhatsapp(targetId) {
+        const cfg = data.config || {};
+        const num = cfg.whatsappNumber || "3854413049";
+        const msg = "Hola, quiero inscribirme a la competencia en PadelHub";
+        document.getElementById(targetId).value = ProcupData.buildWhatsappUrl(num, msg);
+      }
+
+      function handleSponsorFileUpload(e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          const base64 = evt.target.result;
+          document.getElementById("sp-logo").value = base64;
+          const previewDiv = document.getElementById("sp-logo-preview");
+          const previewImg = document.getElementById("sp-logo-img");
+          if (previewDiv && previewImg) {
+            previewImg.src = base64;
+            previewDiv.style.display = "block";
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function renderLists() {
+        // Torneos
+        document.getElementById("list-torneos").innerHTML = (data.torneos || []).map(function (t, i) {
+          return '<div class="hub-card" style="margin-bottom:0.75rem;display:flex;justify-content:space-between;gap:1rem;align-items:center">' +
+            "<div><strong>" + t.nombre + (t.subtitulo ? " <span style='color:#a3e635;font-size:0.85rem'>(" + t.subtitulo + ")</span>" : "") + "</strong>" +
+            "<div class='meta'>" + (t.fecha || "") + " · " + (t.lugar || "") + " · Estado: <strong style='color:#38bdf8'>" + (t.estado || "INSCRIPCIONES") + "</strong>" +
+            (t.bolsa ? " · Bolsa: " + t.bolsa : "") +
+            (t.linkWhatsapp ? " · <a href='" + t.linkWhatsapp + "' target='_blank' style='color:#a3e635'>WhatsApp directo</a>" : " · <span style='color:#64748b'>Usa WhatsApp oficial</span>") +
+            "</div></div>" +
+            '<button class="btn btn-ghost" type="button" onclick="Admin.delTorneo(' + i + ')">Borrar</button></div>';
+        }).join("") || "<p style='color:#94a3b8'>Sin torneos publicados</p>";
+
+        // Ligas
+        document.getElementById("list-ligas").innerHTML = (data.ligas || []).map(function (l, i) {
+          return '<div class="hub-card" style="margin-bottom:0.75rem;display:flex;justify-content:space-between;gap:1rem;align-items:center">' +
+            "<div><strong>" + l.nombre + "</strong>" +
+            "<div class='meta'>" + l.categoria + " · " + l.rama + " · <strong style='color:#38bdf8'>" + l.estado + "</strong>" +
+            " · " + (l.sede || "") + " · " + ((l.parejas && l.parejas.length) || l.inscriptos || 0) + " parejas" +
+            " · <a href='ligas.html?id=" + encodeURIComponent(l.id) + "' target='_blank' style='color:#a3e635'>Ver en vivo</a></div></div>" +
+            '<button class="btn btn-ghost" type="button" onclick="Admin.delLiga(' + i + ')">Borrar</button></div>';
+        }).join("") || "<p style='color:#94a3b8'>Sin ligas creadas</p>";
+
+        // Sponsors
+        document.getElementById("list-sponsors").innerHTML = (data.sponsors || []).map(function (s, i) {
+          return '<div class="hub-card" style="display:flex;flex-direction:column;justify-content:space-between">' +
+            "<div>" +
+              (s.logo ? "<img src='" + s.logo + "' alt='" + s.nombre + "' style='max-height:48px;max-width:120px;border-radius:4px;object-fit:contain;background:#030712;padding:4px;margin-bottom:0.5rem'>" : "") +
+              "<h4 style='margin:0 0 0.25rem;font-size:1.05rem;color:#fff'>" + s.nombre + "</h4>" +
+              "<span class='hub-badge' style='background:#1e293b;color:#a3e635'>" + (s.tipo || "Sponsor") + "</span>" +
+              (s.categoria ? "<div style='font-size:0.78rem;color:#cbd5e1;margin-top:0.35rem'>" + s.categoria + "</div>" : "") +
+              (s.descripcion ? "<p style='font-size:0.75rem;color:#94a3b8;margin:0.4rem 0'>" + s.descripcion + "</p>" : "") +
+              (s.video ? "<div style='font-size:0.75rem;color:#38bdf8;margin-top:0.25rem'>🎥 Video: <a href='" + s.video + "' target='_blank' style='color:#38bdf8;text-decoration:underline'>Ver spot</a></div>" : "") +
+            "</div>" +
+            "<div style='margin-top:0.75rem;padding-top:0.5rem;border-top:1px solid #1e293b;display:flex;justify-content:space-between;align-items:center'>" +
+              (s.link ? "<a href='" + s.link + "' target='_blank' style='font-size:0.75rem;color:#a3e635'>Abrir enlace ➔</a>" : "<span></span>") +
+              '<button class="btn btn-ghost" style="padding:0.25rem 0.6rem;font-size:0.75rem" type="button" onclick="Admin.delSponsor(' + i + ')">Borrar</button>' +
+            "</div>" +
+          "</div>";
+        }).join("") || "<p style='color:#94a3b8;grid-column:1/-1'>Sin sponsors cargados</p>";
+
+        // Partidos para arbitrar
+        const refMatches = [];
+        (data.ligas || []).forEach(l => {
+          (l.fixture || []).forEach((fix) => {
+            refMatches.push({
+              title: `[${l.categoria || l.nombre}] ${fix.parejaA} vs ${fix.parejaB}`,
+              meta: `Cancha: ${fix.cancha || l.sede || 'Cancha 1'} · Fecha ${fix.fecha || 1}`,
+              url: `marcador.html?auth=admin`
+            });
+          });
+          if (l.parejas && l.parejas.length >= 2 && (!l.fixture || !l.fixture.length)) {
+            refMatches.push({
+              title: `[${l.categoria || l.nombre}] ${l.parejas[0].nombre} vs ${l.parejas[1].nombre}`,
+              meta: `Sede: ${l.sede || 'San Miguel Pádel Club'}`,
+              url: `marcador.html?auth=admin`
+            });
+          }
+        });
+        (data.torneos || []).forEach(t => {
+          refMatches.push({
+            title: `[Torneo: ${t.nombre}] Partido Central`,
+            meta: `Sede: ${t.lugar || 'San Miguel'} · ${t.fecha || 'Programado'}`,
+            url: `marcador.html?auth=admin`
+          });
+        });
+
+        const listRef = document.getElementById("list-referee-matches");
+        if (listRef) {
+          listRef.innerHTML = refMatches.map(m => `
+            <div class="hub-card" style="margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;gap:1rem">
+              <div>
+                <strong>${m.title}</strong>
+                <div class="meta">${m.meta}</div>
+              </div>
+              <a class="btn btn-lime" href="${m.url}" target="_blank" style="padding:0.4rem 0.8rem;font-size:0.75rem">Arbitrar ➔</a>
+            </div>
+          `).join("") || "<p style='color:#94a3b8'>Sin partidos programados</p>";
+        }
+
+        // Noticias
+        document.getElementById("list-noticias").innerHTML = (data.noticias || []).map(function (n, i) {
+          return '<div class="hub-card" style="margin-bottom:0.5rem;display:flex;justify-content:space-between;gap:1rem;align-items:center">' +
+            "<div><strong>" + n.titulo + "</strong><div class='meta'>" + (n.fecha || "") + "</div></div>" +
+            '<button class="btn btn-ghost" type="button" onclick="Admin.delNoticia(' + i + ')">Borrar</button></div>';
+        }).join("") || "<p style='color:#94a3b8'>Sin noticias</p>";
+
+        // Actividades
+        document.getElementById("list-actividades").innerHTML = (data.actividades || []).map(function (a, i) {
+          return '<div class="hub-card" style="margin-bottom:0.5rem;display:flex;justify-content:space-between;gap:1rem;align-items:center">' +
+            "<div><strong>" + a.titulo + "</strong><div class='meta'>" + (a.fecha || "") + "</div></div>" +
+            '<button class="btn btn-ghost" type="button" onclick="Admin.delActividad(' + i + ')">Borrar</button></div>';
+        }).join("") || "<p style='color:#94a3b8'>Sin actividades</p>";
+      }
+
+      function save() { return ProcupData.saveAll(data).then(renderLists); }
+
+      function addSponsor() {
+        const nombre = (document.getElementById("sp-nombre").value || "").trim();
+        if (!nombre) { alert("Por favor indicá el nombre del sponsor"); return; }
+        data.sponsors = data.sponsors || [];
+        data.sponsors.unshift({
+          id: "sp-" + Date.now(),
+          nombre: nombre,
+          tipo: document.getElementById("sp-tipo").value,
+          categoria: (document.getElementById("sp-cat").value || "").trim(),
+          logo: (document.getElementById("sp-logo").value || "").trim(),
+          video: (document.getElementById("sp-video").value || "").trim(),
+          link: (document.getElementById("sp-link").value || "").trim(),
+          descripcion: (document.getElementById("sp-desc").value || "").trim(),
+          activo: true
+        });
+        save().then(function () {
+          alert("✓ Sponsor publicado correctamente");
+          document.getElementById("sp-nombre").value = "";
+          document.getElementById("sp-cat").value = "";
+          document.getElementById("sp-logo").value = "";
+          document.getElementById("sp-video").value = "";
+          document.getElementById("sp-link").value = "";
+          document.getElementById("sp-desc").value = "";
+          const previewDiv = document.getElementById("sp-logo-preview");
+          if (previewDiv) previewDiv.style.display = "none";
+        });
+      }
+
+      function addTorneo() {
+        data.torneos = data.torneos || [];
+        const nombre = (document.getElementById("t-nombre").value || "").trim() || "Torneo PadelHub";
+        const waVal = document.getElementById("t-wa").value.trim();
+        const defaultWa = ProcupData.buildWhatsappUrl((data.config && data.config.whatsappNumber) || "3854413049", "Hola PadelHub, quiero inscribirme al " + nombre);
+
+        data.torneos.unshift({
+          id: "t" + Date.now(),
+          nombre: nombre,
+          subtitulo: document.getElementById("t-sub").value.trim(),
+          fecha: document.getElementById("t-fecha").value.trim() || "A confirmar",
+          lugar: document.getElementById("t-lugar").value.trim() || "San Miguel Pádel Club • Frías",
+          estado: document.getElementById("t-estado").value,
+          badge: document.getElementById("t-badge").value.trim() || "Inscripciones Abiertas",
+          categorias: (document.getElementById("t-cats").value || "").split(",").map(function (s) { return s.trim(); }).filter(Boolean),
+          bolsa: document.getElementById("t-bolsa").value.trim() || "$1.000.000 en Premios",
+          cuposConfirmados: parseInt(document.getElementById("t-cupos-conf").value) || 12,
+          cuposTotal: parseInt(document.getElementById("t-cupos-tot").value) || 16,
+          esDestacado: document.getElementById("t-destacado").checked,
+          imagen: document.getElementById("t-img").value.trim(),
+          faseActual: document.getElementById("t-fase").value.trim(),
+          campeones: document.getElementById("t-campeones").value.trim(),
+          linkWhatsapp: waVal ? (waVal.startsWith("http") ? waVal : ProcupData.buildWhatsappUrl(waVal)) : defaultWa
+        });
+
+        save().then(function () {
+          alert("✓ Torneo publicado y disponible en torneos.html");
+          document.getElementById("t-nombre").value = "";
+          document.getElementById("t-sub").value = "";
+          document.getElementById("t-fecha").value = "";
+          document.getElementById("t-cats").value = "";
+          document.getElementById("t-wa").value = "";
+          document.getElementById("t-img").value = "";
+          document.getElementById("t-destacado").checked = false;
+        });
+      }
+
+      function addLiga() {
+        const nombre = document.getElementById("l-nombre").value.trim() || "Liga PadelHub";
+        data.ligas = data.ligas || [];
+        const inscriptosNum = parseInt(document.getElementById("l-inscriptos").value) || 12;
+        data.ligas.unshift({
+          id: "liga-" + Date.now(),
+          slug: nombre.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          nombre: nombre,
+          categoria: document.getElementById("l-cat").value.trim() || "5ª MASCULINA",
+          rama: document.getElementById("l-rama").value,
+          estado: document.getElementById("l-estado").value,
+          temporada: document.getElementById("l-temp").value.trim() || "2026 Apertura",
+          sede: document.getElementById("l-sede").value.trim() || "San Miguel Pádel Club • Frías",
+          ciudad: "Frías",
+          inscriptos: inscriptosNum,
+          faseActual: document.getElementById("l-fase").value.trim() || "Fase de Grupos",
+          lideres: document.getElementById("l-lideres").value.trim() || "Por definir",
+          formato: document.getElementById("l-formato").value.trim() || "Todos contra todos · 2 sets + Super TB",
+          parejas: [],
+          fixture: []
+        });
+        save().then(function () {
+          alert("✓ Liga creada y disponible en ligas.html");
+          document.getElementById("l-nombre").value = "";
+        });
+      }
+
+      function addNoticia() {
+        data.noticias = data.noticias || [];
+        data.noticias.unshift({
+          id: "n" + Date.now(),
+          titulo: document.getElementById("n-titulo").value.trim() || "Noticia PadelHub",
+          extracto: document.getElementById("n-extracto").value.trim(),
+          fecha: document.getElementById("n-fecha").value || new Date().toISOString().slice(0, 10),
+          imagen: ""
+        });
+        save().then(function () { alert("✓ Noticia publicada"); });
+      }
+
+      function addActividad() {
+        data.actividades = data.actividades || [];
+        data.actividades.unshift({
+          id: "a" + Date.now(),
+          titulo: document.getElementById("a-titulo").value.trim() || "Actividad PadelHub",
+          fecha: document.getElementById("a-fecha").value.trim(),
+          lugar: document.getElementById("a-lugar").value.trim() || "San Miguel Pádel Club",
+          badge: document.getElementById("a-badge").value.trim() || "Inscripciones Abiertas",
+          link: document.getElementById("a-link").value.trim() || "torneos.html"
+        });
+        save().then(function () { alert("✓ Actividad publicada"); });
+      }
+
+      function delTorneo(i) { if (confirm("¿Borrar este torneo?")) { data.torneos.splice(i, 1); save(); } }
+      function delLiga(i) { if (confirm("¿Borrar esta liga?")) { data.ligas.splice(i, 1); save(); } }
+      function delSponsor(i) { if (confirm("¿Borrar este sponsor?")) { data.sponsors.splice(i, 1); save(); } }
+      function delNoticia(i) { if (confirm("¿Borrar noticia?")) { data.noticias.splice(i, 1); save(); } }
+      function delActividad(i) { if (confirm("¿Borrar actividad?")) { data.actividades.splice(i, 1); save(); } }
+
+      function seedDemo() {
+        if (!confirm("¿Restaurar datos oficiales PadelHub (Torneos, Ligas, Sponsors y Configuración)?")) return;
+        data = JSON.parse(JSON.stringify(ProcupData.DEMO));
+        save().then(function () {
+          renderConfig();
+          alert("✓ Datos oficiales de PadelHub restaurados correctamente");
+        });
+      }
+
+      function exportJSON() {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "padelhub-procup.json";
+        a.click();
+      }
+
+      document.getElementById("tabs").addEventListener("click", function (e) {
+        if (e.target.tagName !== "BUTTON") return;
+        const tab = e.target.getAttribute("data-tab");
+        [].forEach.call(document.querySelectorAll("#tabs button"), function (b) {
+          b.classList.toggle("on", b.getAttribute("data-tab") === tab);
+        });
+        [].forEach.call(document.querySelectorAll(".tab-panel"), function (p) {
+          p.style.display = "none";
+        });
+        const activePanel = document.getElementById("tab-" + tab);
+        if (activePanel) activePanel.style.display = "block";
+      });
+
+      function init() {
+        status();
+        refresh();
+      }
+
+      return {
+        init: init,
+        saveWhatsappConfig: saveWhatsappConfig,
+        saveRefereeConfig: saveRefereeConfig,
+        testWhatsappLink: testWhatsappLink,
+        fillDefaultWhatsapp: fillDefaultWhatsapp,
+        handleSponsorFileUpload: handleSponsorFileUpload,
+        addSponsor: addSponsor,
+        delSponsor: delSponsor,
+        addTorneo: addTorneo,
+        addLiga: addLiga,
+        addNoticia: addNoticia,
+        addActividad: addActividad,
+        delTorneo: delTorneo,
+        delLiga: delLiga,
+        delNoticia: delNoticia,
+        delActividad: delActividad,
+        seedDemo: seedDemo,
+        exportJSON: exportJSON
+      };
+    })();
+
+    // Ejecutar verificación de autenticación inicial
+    AdminAuth.checkAccess();
+  </script>
+</body>
+</html>

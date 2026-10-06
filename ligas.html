@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html class="h-full bg-slate-950 text-slate-100" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Ligas Oficiales 2026 | PadelHub PRO CUP</title>
+  <!-- Tailwind CSS CDN with Forms and Container Queries -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Tailwind Configuration -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: "#101419",
+            "surface-container": "#1c2025",
+            "surface-tint": "#98da27",
+            "on-surface": "#e0e2ea",
+            "on-surface-variant": "#c2cab0",
+            "surface-container-high": "#262a30",
+            "surface-container-lowest": "#0a0e13",
+            "surface-container-highest": "#31353b",
+            primary: "#ccff80",
+            "primary-container": "#a3e635",
+            "on-primary": "#213600",
+            secondary: "#adc6ff",
+            "secondary-container": "#0566d9",
+            "on-secondary-container": "#e6ecff",
+            tertiary: "#bdffc2",
+            "tertiary-fixed": "#6bff8f",
+            "tertiary-fixed-dim": "#4ae176",
+            brand: {
+              lime: '#a3e635',
+              limeHover: '#bef264',
+              limeDark: '#4d7c0f',
+              dark: '#090d16',
+              card: '#0f172a',
+            }
+          },
+          boxShadow: {
+            'glow-lime': '0 0 30px -5px rgba(163, 230, 53, 0.45)',
+            'glow-cyan': '0 0 25px -5px rgba(56, 189, 248, 0.25)',
+            'glow-gold': '0 0 30px -5px rgba(234, 179, 8, 0.35)',
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Court Graphic Texture & Animations -->
+  <style data-purpose="background-mesh">
+    .court-grid-pattern {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(163, 230, 53, 0.14), transparent 50%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 64px 64px, 64px 64px;
+    }
+  </style>
+  <meta content="web_standard" name="shell-type"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans court-grid-pattern antialiased selection:bg-brand-lime selection:text-slate-950">
+
+<!-- BEGIN: NavigationBar (Sin botón de Admin, enlaces funcionales) -->
+<header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <!-- Brand Logo -->
+    <a class="flex items-center gap-3 group" href="index.html" title="PadelHub Inicio">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-lime to-emerald-400 flex items-center justify-center shadow-glow-lime transform transition-transform group-hover:scale-105">
+        <i class="w-6 h-6 text-slate-950 stroke-[2.5]" data-lucide="shield"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-black tracking-tight text-white uppercase italic">
+          Padel<span class="text-brand-lime">Hub</span>
+        </span>
+        <span class="text-[10px] tracking-widest text-slate-400 font-semibold uppercase -mt-1">SISTEMA DE COMPETICIÓN</span>
+      </div>
+    </a>
+
+    <!-- Primary Navigation Links -->
+    <nav class="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold tracking-wide">
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="index.html">INICIO</a>
+      <a class="text-brand-lime border-b-2 border-brand-lime pb-1 font-bold" href="ligas.html">LIGAS</a>
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="torneos.html">TORNEOS</a>
+      <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700/60 text-slate-200 hover:border-brand-lime hover:text-brand-lime text-xs tracking-wider transition-all duration-200 shadow-sm" href="vivo.html">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        MARCADOR EN VIVO
+      </a>
+    </nav>
+  </div>
+</header>
+<!-- END: NavigationBar -->
+
+<!-- BEGIN: MainContent -->
+<main class="flex-grow flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8 relative">
+  <div class="flex flex-col w-full max-w-7xl mx-auto">
+
+    <!-- 1. HERO / BANNER SECTION -->
+    <div class="relative w-full rounded-3xl overflow-hidden bg-slate-950 border border-brand-lime/30 shadow-glow-lime mb-10 group">
+      <!-- Dynamic Cinematic Smash Background Image -->
+      <div class="relative w-full min-h-[500px] lg:min-h-[560px] flex flex-col justify-end p-6 sm:p-10 lg:p-14 overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFDY7LHXr5AygAczrcpRafY95x37rbJiO-8yyRacBVYYIBdwvj7brUP_-usV7q5byghCmmWWlwyJdKLgdkMFimRtO36fyIlcE_I_YyBw0AB_61-n3lUchLAArijD33pliMfACzmVW5-QY6fq-49TE4cNN5EFz3TzzHClU-XW3IInmcNT1J_VGDHklJZ1IjIsTH0bxGph1uXcM7DYPT07mTupxZTykwMrWhBctClRo');"></div>
+        <!-- Multi-layered Gradients -->
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/70 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950"></div>
+        <!-- Neon Lime Ambient Flares -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-brand-lime/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -right-32 w-96 h-96 rounded-full bg-cyan-500/20 blur-3xl pointer-events-none"></div>
+
+        <!-- Inner Content -->
+        <div class="relative z-10 max-w-4xl flex flex-col gap-5">
+          <!-- Breadcrumb + Tag -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-1.5 text-slate-400 text-xs uppercase tracking-widest font-bold">
+              <span>INICIO</span>
+              <span class="material-symbols-outlined text-xs text-brand-lime">chevron_right</span>
+              <span class="text-brand-lime font-black">LIGAS OFICIALES 2026</span>
+            </div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-lime/20 border border-brand-lime/50 text-brand-lime font-black text-xs tracking-wider uppercase">
+              <span class="w-2 h-2 rounded-full bg-brand-lime animate-ping"></span>
+              CIRCUITO PROFESIONAL FEDERADO
+            </span>
+          </div>
+
+          <!-- Title & Headline -->
+          <div class="space-y-2">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white uppercase italic tracking-tight drop-shadow-xl leading-none">
+              Ligas Oficiales <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-lime via-lime-300 to-emerald-400 not-italic">PadelHub 2026</span>
+            </h1>
+            <p class="text-lg sm:text-xl font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
+              <span class="text-brand-lime">⚡</span> Viví la adrenalina de cada punto. Clasificá al Master Final.
+            </p>
+          </div>
+
+          <!-- Dynamic Stat Badges (Cargados en Vivo desde Admin) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">🔥</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Competición</span>
+                <span id="hero-stat-ligas-activas" class="text-sm font-black text-white tracking-wide">6 LIGAS ACTIVAS</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">⚡</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Jugadores</span>
+                <span id="hero-stat-parejas-total" class="text-sm font-black text-white tracking-wide">76 PAREJAS</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">🏆</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pozo Oficial</span>
+                <span class="text-sm font-black text-brand-lime tracking-wide">$3.000.000 EN PREMIOS</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+              </span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Transmisión</span>
+                <span class="text-sm font-black text-white tracking-wide">EN DIRECTO SEDES</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick CTA Row -->
+          <div class="flex flex-wrap items-center gap-4 pt-3">
+            <a id="hero-wsp-cta" class="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-lime to-lime-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-glow-lime hover:scale-[1.02] active:scale-[0.98] transition-all" href="#inscribir-pareja">
+              <span class="text-base">⚡</span>
+              <span>Inscribir Mi Pareja Ahora</span>
+              <i class="w-4 h-4 stroke-[3]" data-lucide="arrow-right"></i>
+            </a>
+            <a class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-sm uppercase tracking-wider border border-slate-700 backdrop-blur-md transition-all" href="#tabla-posiciones">
+              <i class="w-4 h-4 text-brand-lime" data-lucide="bar-chart-2"></i>
+              <span>Ver Tabla General</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DESTACADO DE LA TEMPORADA / MASTER FINAL CAMPEONATO -->
+    <section class="w-full mb-12">
+      <div class="relative rounded-3xl overflow-hidden bg-slate-900 border border-amber-500/30 shadow-glow-gold group">
+        <div class="grid grid-cols-1 lg:grid-cols-12 items-center">
+          <!-- Feature Banner Left Image -->
+          <div class="lg:col-span-5 relative h-72 lg:h-full min-h-[320px] overflow-hidden">
+            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDhpNA24lhkZnEBhg-Mg9PRRmz-weIO-Mj4llHwrWykt55sOnixPfz_bYfRLQQXGvujc5WYatkZrAVw-D7Ei1P3nYOVSGdIIvmZjVHisBFy-l6hP1CX8OEMCB3NdD08sl-8fEnGQ4E4YvcFhcC4FWThWdg0mJe6SUKdr_U4XY3NsDG7whhJu-M7ITLzO5osExNtMzkuETnKP1IK59fLnRFphe-HKE9DTDxWqspGJLo');"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-900 hidden lg:block"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent lg:hidden"></div>
+            <div class="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 backdrop-blur-md text-amber-300 font-black text-xs uppercase tracking-widest flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">emoji_events</span>
+              EVENTO ESTELAR ANUAL
+            </div>
+          </div>
+          <!-- Feature Banner Right Content -->
+          <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-center gap-4">
+            <div class="flex items-center gap-2 text-amber-400 font-mono text-xs uppercase tracking-widest font-black">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              TEMPORADA OFICIAL CLASIFICATORIA
+            </div>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white uppercase italic tracking-tight">
+              Camino al Master Final 2026 <br/>
+              <span class="text-amber-400 not-italic font-extrabold text-xl sm:text-2xl tracking-normal">San Miguel Pádel Club • Frías</span>
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Los mejores 8 binomios del año clasificarán directo a la fecha estelar con trofeos de carbono y premios exclusivos. Cada victoria en fase de zonas suma puntos vitales en la Carrera de Campeones.
+            </p>
+            <!-- Perks List -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+              <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                <span class="text-xs text-amber-400 font-bold uppercase block mb-1">⭐ Premiación</span>
+                <span class="text-sm font-bold text-white">Paletas Pro &amp; Trofeos Oficiales</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                <span class="text-xs text-brand-lime font-bold uppercase block mb-1">🎥 Cobertura</span>
+                <span class="text-sm font-bold text-white">Streaming HD con Relatos</span>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                <span class="text-xs text-cyan-400 font-bold uppercase block mb-1">🏅 Ranking</span>
+                <span class="text-sm font-bold text-white">1000 Pts Circuito Nacional</span>
+              </div>
+            </div>
+            <div class="pt-2 flex items-center gap-4">
+              <a class="inline-flex items-center gap-2 text-sm font-black text-amber-400 hover:text-amber-300 uppercase tracking-wider group-hover:translate-x-1 transition-all" href="#tabla-posiciones">
+                <span>Ver ranking clasificatorio actual</span>
+                <i class="w-4 h-4 stroke-[3]" data-lucide="chevron-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Controls, Search & Filter Bar -->
+    <section class="w-full mb-8 flex flex-col gap-6">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl">
+        <!-- State Tabs -->
+        <div class="flex items-center overflow-x-auto gap-2 pb-2 lg:pb-0 scrollbar-none" id="statusTabs">
+          <button data-status="TODAS" class="px-4 py-2 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wide transition-all shadow-glow-lime whitespace-nowrap">
+            TODAS (<span id="tab-count-todas">0</span>)
+          </button>
+          <button data-status="EN_CURSO" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all whitespace-nowrap">
+            EN CURSO (<span id="tab-count-curso">0</span>)
+          </button>
+          <button data-status="INSCRIPCIONES" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all whitespace-nowrap">
+            INSCRIPCIONES (<span id="tab-count-insc">0</span>)
+          </button>
+          <button data-status="FINALIZADA" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all whitespace-nowrap">
+            FINALIZADAS (<span id="tab-count-fin">0</span>)
+          </button>
+        </div>
+
+        <!-- Filters & Search -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Division Pills -->
+          <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800" id="ramaPills">
+            <button data-rama="TODOS" class="px-3 py-1.5 rounded-lg bg-brand-lime text-slate-950 font-black text-xs uppercase">TODOS</button>
+            <button data-rama="MASCULINA" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-bold text-xs uppercase">MASCULINO</button>
+            <button data-rama="FEMENINA" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-bold text-xs uppercase">FEMENINO</button>
+            <button data-rama="MIXTA" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-bold text-xs uppercase">MIXTO</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative min-w-[200px] flex-grow sm:flex-grow-0">
+            <span class="material-symbols-outlined absolute left-3 top-2 text-slate-400 text-base">search</span>
+            <input id="ligaSearchInput" class="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs pl-9 pr-3 py-2 rounded-xl placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-lime" placeholder="Buscar liga o sede..." type="text"/>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. CARDS DE LIGAS ACTIVAS (CARGADAS DINÁMICAMENTE DESDE ADMIN.HTML) -->
+    <section class="w-full mb-16">
+      <div id="ligasGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado dinámico -->
+      </div>
+    </section>
+
+    <!-- 4. TABLA DE POSICIONES EN TIEMPO REAL (PREMIUM PRO SPORTS UI) -->
+    <section class="w-full rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 lg:p-10 shadow-2xl mb-12" id="tabla-posiciones">
+      <!-- Header of Standings -->
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-6 mb-6 border-b border-slate-800">
+        <div>
+          <!-- Live update badge -->
+          <div class="flex items-center gap-2 mb-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-lime animate-ping"></span>
+            <span class="text-xs font-black text-brand-lime uppercase tracking-widest flex items-center gap-1">
+              🟢 Sincronizado en tiempo real con panel de árbitros (Admin)
+            </span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">
+            Tabla de Posiciones Oficial • <span id="table-active-league-name" class="text-brand-lime not-italic font-extrabold">Circuito 2026</span>
+          </h2>
+        </div>
+
+        <!-- Interactive Category Tabs with Neon Lime Active State -->
+        <div class="flex items-center gap-2 overflow-x-auto bg-slate-950 p-1.5 rounded-2xl border border-slate-800 scrollbar-none" id="tableCategoryTabs">
+          <!-- Renderizado dinámico de pestañas según las ligas existentes -->
+        </div>
+      </div>
+
+      <!-- Responsive Standings Table -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border border-slate-800">
+              <th class="py-3.5 px-4 rounded-l-xl">POS</th>
+              <th class="py-3.5 px-4">PAREJA / JUGADORES</th>
+              <th class="py-3.5 px-3 text-center">PJ</th>
+              <th class="py-3.5 px-3 text-center">PG</th>
+              <th class="py-3.5 px-3 text-center">PP</th>
+              <th class="py-3.5 px-3 text-center hidden sm:table-cell">SET DIF</th>
+              <th class="py-3.5 px-3 text-center hidden sm:table-cell">GAME DIF</th>
+              <th class="py-3.5 px-4 text-center">PTS</th>
+              <th class="py-3.5 px-4 text-center rounded-r-xl">RACHA</th>
+            </tr>
+          </thead>
+          <tbody id="standingsTableBody" class="divide-y divide-slate-800/60">
+            <!-- Renderizado dinámico de posiciones -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table Actions & Classification Legend -->
+      <div class="flex flex-wrap items-center justify-between gap-4 mt-6 pt-5 border-t border-slate-800">
+        <div class="flex flex-wrap items-center gap-6">
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-md bg-brand-lime"></span>
+            <span class="text-xs text-slate-300 uppercase tracking-wider font-bold">Clasificación Directa a Master Final</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3.5 h-3.5 rounded-md bg-slate-700"></span>
+            <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Permanencia en Categoría</span>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-4">
+          <a id="btn-inscribir-tabla" class="px-4 py-2 rounded-xl bg-brand-lime hover:bg-lime-400 text-slate-950 text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-glow-lime transition-all" href="#inscribir-pareja">
+            <span>Inscribirme en esta Categoría</span>
+            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECCIÓN DE SPONSORS Y MARCAS PROMOCIONALES (DESDE ADMIN) -->
+    <section class="w-full mb-12" id="ligas-sponsors-section">
+      <div class="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 lg:p-10 shadow-2xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-6">
+          <div>
+            <span class="text-xs font-black text-brand-lime uppercase tracking-widest block mb-1">🤝 PATROCINADORES OFICIALES</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">
+              SPONSORS DEL <span class="text-brand-lime not-italic font-extrabold">CIRCUITO DE LIGAS 2026</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm mt-1">Equipamiento, hidratación y complejos oficiales que respaldan a nuestros jugadores.</p>
+          </div>
+        </div>
+        <div id="ligasSponsorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Direct Registration CTA Anchor (Con WhatsApp de Admin) -->
+    <div class="w-full rounded-2xl bg-gradient-to-r from-brand-lime/20 via-slate-900 to-cyan-500/20 border border-brand-lime/40 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 mb-8 shadow-glow-lime" id="inscribir-pareja">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-brand-lime flex items-center justify-center text-slate-950 font-black shadow-lg flex-shrink-0">
+          <span class="material-symbols-outlined text-3xl">sports_tennis</span>
+        </div>
+        <div>
+          <h3 class="text-xl sm:text-2xl font-black text-white uppercase italic">¿Querés sumar tu pareja al circuito oficial?</h3>
+          <p class="text-slate-300 text-sm">Inscripciones con cupos limitados por orden de confirmación vía WhatsApp.</p>
+        </div>
+      </div>
+      <a id="btn-wsp-oficial-cta" class="px-6 py-3.5 rounded-xl bg-brand-lime hover:bg-lime-400 text-slate-950 font-black text-xs uppercase tracking-wider shadow-glow-lime flex items-center gap-2 whitespace-nowrap transition-all" href="#" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined text-base">chat</span>
+        <span>Inscribirme por WhatsApp Oficial</span>
+      </a>
+    </div>
+
+    <!-- Live Database Telemetry Bar (Sin Botón Admin) -->
+    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 mb-4">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-brand-lime text-lg">cloud_done</span>
+        <span class="text-xs text-slate-300">
+          Datos sincronizados automáticamente con el panel de administración central <strong class="text-white">PadelHub</strong>.
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-500 font-bold">
+        <span class="w-2 h-2 rounded-full bg-brand-lime"></span>
+        <span id="ligas-sync-status">Sincronizado en tiempo real</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+<!-- END: MainContent -->
+
+<!-- BEGIN: MainFooter -->
+<footer class="border-t border-slate-800/80 bg-slate-950 text-slate-500 text-xs py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2"><span class="font-bold text-slate-300">PadelHub</span><span>•</span><span>Sistema y Circuito Oficial de Pádel © 2026</span></div>
+    <div class="flex items-center gap-6">
+      <a class="hover:text-slate-400 transition-colors" href="#">Términos del Circuito</a>
+      <a class="hover:text-slate-400 transition-colors" href="#">Privacidad de Jugadores</a>
+      <a class="hover:text-slate-400 transition-colors" href="#">Soporte Técnico</a>
+    </div>
+  </div>
+</footer>
+<!-- END: MainFooter -->
+
+<!-- DATA SCRIPTS & LOGIC -->
+<script src="js/firebase-config.js?v=5"></script>
+<script src="js/procup-data.js?v=5"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    let allLigas = [];
+    let currentConfig = {};
+    let activeStatusFilter = "TODAS";
+    let activeRamaFilter = "TODOS";
+    let searchQuery = "";
+    let selectedLigaIndex = 0;
+
+    function getWaUrl(nombreLiga) {
+      const num = (currentConfig && currentConfig.whatsappNumber) || "3854413049";
+      const clean = String(num).replace(/[^0-9]/g, "");
+      const text = nombreLiga
+        ? "Hola PadelHub, quiero inscribir mi pareja para la " + nombreLiga
+        : "Hola PadelHub, quiero inscribir mi pareja para las ligas oficiales";
+      if (typeof ProcupData !== "undefined" && typeof ProcupData.buildWhatsappUrl === "function") {
+        return ProcupData.buildWhatsappUrl(clean, text);
+      }
+      return "https://wa.me/" + clean + "?text=" + encodeURIComponent(text);
+    }
+
+    function renderLigasCards() {
+      const grid = document.getElementById("ligasGrid");
+
+      const filtered = allLigas.filter(l => {
+        // Status filter
+        if (activeStatusFilter !== "TODAS") {
+          const st = (l.estado || "EN_CURSO").toUpperCase();
+          if (activeStatusFilter === "EN_CURSO" && st !== "EN_CURSO") return false;
+          if (activeStatusFilter === "INSCRIPCIONES" && st !== "INSCRIPCIONES") return false;
+          if (activeStatusFilter === "FINALIZADA" && st !== "FINALIZADA") return false;
+        }
+
+        // Rama filter
+        if (activeRamaFilter !== "TODOS") {
+          const r = (l.rama || "MASCULINA").toUpperCase();
+          if (r !== activeRamaFilter) return false;
+        }
+
+        // Search query
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const hay = ((l.nombre || "") + " " + (l.categoria || "") + " " + (l.sede || "") + " " + (l.formato || "")).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+
+        return true;
+      });
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center rounded-3xl bg-slate-900/60 border border-slate-800">
+            <span class="material-symbols-outlined text-4xl text-slate-500 mb-2">sports_tennis</span>
+            <p class="text-base font-bold text-slate-300">No hay ligas que coincidan con los filtros seleccionados.</p>
+            <p class="text-xs text-slate-500 mt-1">Probá cambiando el estado o la rama.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map((l, idx) => {
+        const estado = (l.estado || "EN_CURSO").toUpperCase();
+        const numInscriptos = (l.parejas && l.parejas.length) ? l.parejas.length : (l.inscriptos || 12);
+        const progreso = l.progreso || (estado === "FINALIZADA" ? 100 : 57);
+        const waLink = getWaUrl(l.nombre);
+
+        // ESTADO 1: EN CURSO
+        if (estado === "EN_CURSO") {
+          return `
+            <article class="flex flex-col justify-between rounded-2xl bg-slate-900/90 border border-brand-lime/40 p-6 shadow-xl relative overflow-hidden group hover:border-brand-lime hover:shadow-glow-lime transition-all duration-300">
+              <div class="absolute -right-8 -top-8 w-36 h-36 bg-brand-lime/15 rounded-full blur-2xl group-hover:bg-brand-lime/25 transition-all"></div>
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-slate-950 animate-ping"></span>
+                    EN CURSO
+                  </span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-950 border border-brand-lime/40 text-brand-lime font-black text-xs uppercase">
+                    ${l.categoria || "5ª MASCULINA"}
+                  </span>
+                </div>
+                <h3 class="text-xl font-black text-white uppercase italic mb-1 group-hover:text-brand-lime transition-colors">
+                  ${l.nombre}
+                </h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-5">
+                  <span class="material-symbols-outlined text-brand-lime text-base">location_on</span>
+                  <span>${l.sede || "San Miguel Pádel Club • Frías"}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3 p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 mb-5">
+                  <div>
+                    <span class="block text-slate-400 text-[11px] font-bold uppercase tracking-wider">Inscriptos</span>
+                    <span class="text-lg font-black text-white">${numInscriptos} Parejas</span>
+                  </div>
+                  <div>
+                    <span class="block text-slate-400 text-[11px] font-bold uppercase tracking-wider">Fase Actual</span>
+                    <span class="text-lg font-black text-brand-lime">${l.faseActual || "Fecha 4 / 7"}</span>
+                  </div>
+                  <div class="col-span-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                    <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Líderes de Zona:</span>
+                    <span class="text-xs font-black text-white flex items-center gap-1 truncate max-w-[200px]">
+                      <span class="material-symbols-outlined text-brand-lime text-sm flex-shrink-0">crown</span>
+                      ${l.lideres || "Coronel / Gómez"}
+                    </span>
+                  </div>
+                </div>
+                <div class="w-full mb-6">
+                  <div class="flex justify-between items-center mb-1.5">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avance de Temporada</span>
+                    <span class="text-xs font-black text-brand-lime">${progreso}%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                    <div class="h-full bg-gradient-to-r from-brand-lime to-emerald-400 rounded-full" style="width: ${progreso}%;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <button class="flex-1 py-3 px-4 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wider text-center shadow-glow-lime hover:bg-lime-400 transition-all" onclick="selectLigaForTable('${l.id}')">
+                  Ver Fixture &amp; Tabla →
+                </button>
+              </div>
+            </article>
+          `;
+        }
+
+        // ESTADO 2: INSCRIPCIONES ABIERTAS
+        if (estado === "INSCRIPCIONES") {
+          const cuposTot = l.cuposTotal || 16;
+          const cuposConf = l.cuposConfirmados || numInscriptos;
+          const pctCupos = Math.min(100, Math.round((cuposConf / cuposTot) * 100));
+          return `
+            <article class="flex flex-col justify-between rounded-2xl bg-slate-900/90 border border-cyan-500/40 p-6 shadow-xl relative overflow-hidden group hover:border-cyan-400 hover:shadow-glow-cyan transition-all duration-300">
+              <div class="absolute -right-8 -top-8 w-36 h-36 bg-cyan-500/15 rounded-full blur-2xl group-hover:bg-cyan-500/25 transition-all"></div>
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-slate-950 animate-pulse"></span>
+                    INSCRIPCIONES ABIERTAS
+                  </span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-950 border border-cyan-500/40 text-cyan-300 font-black text-xs uppercase">
+                    ${l.categoria || "8ª FEMENINA"}
+                  </span>
+                </div>
+                <h3 class="text-xl font-black text-white uppercase italic mb-1 group-hover:text-cyan-300 transition-colors">
+                  ${l.nombre}
+                </h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-5">
+                  <span class="material-symbols-outlined text-cyan-400 text-base">calendar_month</span>
+                  <span>${l.sede || "San Miguel Pádel • Inicio Septiembre"}</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 mb-5 flex flex-col gap-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cupos Confirmados</span>
+                    <span class="text-xs font-black text-cyan-300">${cuposConf} / ${cuposTot} PAREJAS</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-slate-950 overflow-hidden border border-slate-800">
+                    <div class="h-full bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full" style="width: ${pctCupos}%;"></div>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-xs text-amber-400 font-black tracking-wide">
+                    <span>🔥</span> ¡Últimos ${Math.max(1, cuposTot - cuposConf)} lugares disponibles!
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-950/40 border border-slate-800/60 mb-6">
+                  <span class="block text-slate-400 text-[11px] font-bold uppercase mb-1">Formato y Premios</span>
+                  <p class="text-xs text-slate-200">${l.formato || "Paletas Bullpadel + Indumentaria Pro + Puntos Ranking Oficial."}</p>
+                </div>
+              </div>
+              <a class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 transition-all" href="${waLink}" target="_blank" rel="noopener">
+                <span class="material-symbols-outlined text-base">chat</span>
+                <span>Inscribirme por WhatsApp →</span>
+              </a>
+            </article>
+          `;
+        }
+
+        // ESTADO 3: FINALIZADA
+        return `
+          <article class="flex flex-col justify-between rounded-2xl bg-slate-900/60 border border-slate-800 p-6 shadow-lg relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                  FINALIZADA
+                </span>
+                <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 font-black text-xs uppercase">
+                  ${l.categoria || "SUMA 12"}
+                </span>
+              </div>
+              <h3 class="text-xl font-black text-slate-200 uppercase italic mb-1">
+                ${l.nombre}
+              </h3>
+              <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-5">
+                <span class="material-symbols-outlined text-amber-400 text-base">emoji_events</span>
+                <span>${l.sede || "San Miguel Pádel Club"}</span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-400/20 border border-amber-400/40 flex items-center justify-center text-amber-400 flex-shrink-0">
+                  <span class="material-symbols-outlined">workspace_premium</span>
+                </div>
+                <div>
+                  <span class="block text-slate-400 text-[11px] font-bold uppercase">Pareja Campeona</span>
+                  <span class="text-sm font-black text-white">${l.lideres || "Sánchez / Di Nenno"}</span>
+                </div>
+              </div>
+            </div>
+            <button class="w-full py-3 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all" onclick="selectLigaForTable('${l.id}')">
+              Ver Historial y Cuadro Final
+            </button>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderTableTabs() {
+      const container = document.getElementById("tableCategoryTabs");
+      if (!allLigas.length) return;
+
+      container.innerHTML = allLigas.map((l, i) => {
+        const isCurrent = i === selectedLigaIndex;
+        const cls = isCurrent
+          ? "px-4 py-2 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wider shadow-glow-lime transition-all whitespace-nowrap"
+          : "px-4 py-2 rounded-xl text-slate-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-all whitespace-nowrap";
+        return `<button class="${cls}" onclick="switchTableTab(${i})">${l.categoria || l.nombre}</button>`;
+      }).join("");
+    }
+
+    window.switchTableTab = function(index) {
+      selectedLigaIndex = index;
+      renderTableTabs();
+      renderStandingsTable();
+    };
+
+    window.selectLigaForTable = function(ligaId) {
+      const idx = allLigas.findIndex(l => l.id === ligaId);
+      if (idx >= 0) {
+        selectedLigaIndex = idx;
+        renderTableTabs();
+        renderStandingsTable();
+        const section = document.getElementById("tabla-posiciones");
+        if (section) section.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    function renderStandingsTable() {
+      const currentLiga = allLigas[selectedLigaIndex] || allLigas[0];
+      const tbody = document.getElementById("standingsTableBody");
+      const titleEl = document.getElementById("table-active-league-name");
+
+      if (!currentLiga) return;
+
+      if (titleEl) {
+        titleEl.textContent = currentLiga.nombre;
+      }
+
+      // Actualizar botón de inscripción con el nombre de la liga actual
+      const btnInscribir = document.getElementById("btn-inscribir-tabla");
+      if (btnInscribir) {
+        btnInscribir.href = getWaUrl(currentLiga.nombre);
+        btnInscribir.target = "_blank";
+      }
+
+      const parejas = (currentLiga.parejas || []).slice().sort((a, b) => {
+        if ((b.pts || 0) !== (a.pts || 0)) return (b.pts || 0) - (a.pts || 0);
+        return ((b.sf || 0) - (b.sc || 0)) - ((a.sf || 0) - (a.sc || 0));
+      });
+
+      if (!parejas.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" class="py-8 text-center text-slate-400 text-sm">
+              Esta liga aún no tiene parejas cargadas o está en etapa de inscripciones abiertas.
+              <br/>
+              <a href="${getWaUrl(currentLiga.nombre)}" target="_blank" class="text-brand-lime font-bold hover:underline inline-block mt-2">
+                ¡Inscribí tu pareja vía WhatsApp para aparecer en la tabla oficial! ➔
+              </a>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = parejas.map((p, i) => {
+        const pos = i + 1;
+        const isLeader = pos === 1;
+        const isMaster = pos <= 2 || p.statusMaster;
+        const isPlayoff = pos === 3 || p.statusPlayoff;
+
+        const borderClass = isLeader 
+          ? "border-l-4 border-l-brand-lime bg-brand-lime/5 hover:bg-brand-lime/10" 
+          : (isMaster 
+            ? "border-l-4 border-l-emerald-500/60 hover:bg-slate-800/40" 
+            : "border-l-4 border-l-slate-700 hover:bg-slate-800/40");
+
+        const posText = pos < 10 ? "0" + pos : pos;
+
+        // Render racha badges
+        const rachaItems = (p.racha && p.racha.length ? p.racha : ["V", "V", "D", "V", "V"]).slice(0, 5);
+        const rachaHtml = rachaItems.map(r => {
+          const isWin = r === "V";
+          const bg = isWin ? "bg-brand-lime text-slate-950 font-black shadow-sm" : "bg-rose-500 text-white font-black";
+          return `<span class="w-5 h-5 rounded-md ${bg} text-[11px] flex items-center justify-center">${r}</span>`;
+        }).join("");
+
+        const statusBadge = isMaster
+          ? `<span class="inline-flex items-center gap-1.5 text-[11px] text-brand-lime uppercase font-black tracking-wider mt-0.5">
+               <span class="w-1.5 h-1.5 rounded-full bg-brand-lime animate-pulse"></span>
+               CLASIFICACIÓN DIRECTA A MASTER FINAL
+             </span>`
+          : (isPlayoff 
+            ? `<span class="text-[11px] text-slate-400 uppercase font-semibold">Play-off Clasificatorio</span>`
+            : `<span class="text-[11px] text-slate-400 uppercase font-semibold">Permanencia en Categoría</span>`);
+
+        return `
+          <tr class="${borderClass} transition-colors">
+            <td class="py-4 px-4 font-black ${isLeader ? 'text-brand-lime text-xl' : 'text-slate-200 text-lg'}">
+              <div class="flex items-center gap-1.5">
+                ${isLeader ? '<span class="material-symbols-outlined text-amber-400 text-2xl drop-shadow-md">crown</span>' : ''}
+                <span>${posText}</span>
+              </div>
+            </td>
+            <td class="py-4 px-4">
+              <div class="flex flex-col">
+                <span class="text-base font-black text-white uppercase tracking-wide">${p.nombre}</span>
+                ${statusBadge}
+              </div>
+            </td>
+            <td class="py-4 px-3 text-center text-sm font-bold text-slate-200">${p.pj || 0}</td>
+            <td class="py-4 px-3 text-center text-sm font-black ${isLeader ? 'text-brand-lime' : 'text-emerald-400'}">${p.pg || 0}</td>
+            <td class="py-4 px-3 text-center text-sm font-medium text-slate-400">${p.pp || 0}</td>
+            <td class="py-4 px-3 text-center text-sm font-bold text-slate-200 hidden sm:table-cell">${p.difSets || ((p.sf || 0) - (p.sc || 0))}</td>
+            <td class="py-4 px-3 text-center text-sm font-bold text-slate-200 hidden sm:table-cell">${p.difGames || "+10"}</td>
+            <td class="py-4 px-4 text-center text-xl font-black ${isLeader ? 'text-brand-lime' : 'text-white'}">${p.pts || 0}</td>
+            <td class="py-4 px-4 text-center">
+              <div class="flex items-center justify-center gap-1">
+                ${rachaHtml}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderSponsors(sponsors) {
+      const grid = document.getElementById("ligasSponsorsGrid");
+      if (!sponsors || !sponsors.length) {
+        document.getElementById("ligas-sponsors-section").style.display = "none";
+        return;
+      }
+      document.getElementById("ligas-sponsors-section").style.display = "block";
+
+      grid.innerHTML = sponsors.map(s => {
+        return `
+          <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-5 flex flex-col justify-between hover:border-brand-lime/40 transition-all group">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-black text-brand-lime uppercase">
+                  ${s.tipo || "Sponsor Oficial"}
+                </span>
+                ${s.link ? `<a href="${s.link}" target="_blank" class="text-slate-500 hover:text-brand-lime text-xs flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-sm">open_in_new</span></a>` : ''}
+              </div>
+              ${s.logo ? `
+                <div class="w-full h-24 mb-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-center overflow-hidden p-2">
+                  <img src="${s.logo}" alt="${s.nombre}" class="max-h-20 max-w-full object-contain group-hover:scale-105 transition-transform duration-300">
+                </div>
+              ` : ''}
+              <h4 class="text-base font-black text-white uppercase italic">${s.nombre}</h4>
+              ${s.categoria ? `<p class="text-xs text-amber-400 font-bold mb-1">${s.categoria}</p>` : ''}
+              ${s.descripcion ? `<p class="text-xs text-slate-400 mt-1">${s.descripcion}</p>` : ''}
+            </div>
+            ${s.video ? `
+              <div class="mt-4 pt-3 border-t border-slate-800/80">
+                <a href="${s.video}" target="_blank" class="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-cyan-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                  <span class="material-symbols-outlined text-sm text-cyan-400">play_circle</span>
+                  <span>Ver Spot / Video Promocional</span>
+                </a>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function updateStats() {
+      const activas = allLigas.filter(l => (l.estado || "").toUpperCase() === "EN_CURSO").length;
+      const insc = allLigas.filter(l => (l.estado || "").toUpperCase() === "INSCRIPCIONES").length;
+      const fin = allLigas.filter(l => (l.estado || "").toUpperCase() === "FINALIZADA").length;
+
+      let totalParejas = 0;
+      allLigas.forEach(l => {
+        totalParejas += (l.parejas && l.parejas.length) ? l.parejas.length : (l.inscriptos || 12);
+      });
+
+      document.getElementById("tab-count-todas").textContent = allLigas.length;
+      document.getElementById("tab-count-curso").textContent = activas;
+      document.getElementById("tab-count-insc").textContent = insc;
+      document.getElementById("tab-count-fin").textContent = fin;
+
+      document.getElementById("hero-stat-ligas-activas").textContent = allLigas.length + " LIGAS ACTIVAS";
+      document.getElementById("hero-stat-parejas-total").textContent = totalParejas + " PAREJAS";
+    }
+
+    // CARGAR DATOS DESDE PROCUPDATA (ADMIN.HTML)
+    ProcupData.loadAll().then(data => {
+      currentConfig = data.config || {};
+      allLigas = data.ligas || [];
+
+      // Vincular botón oficial de WhatsApp
+      const btnOficial = document.getElementById("btn-wsp-oficial-cta");
+      if (btnOficial) btnOficial.href = getWaUrl();
+
+      // Actualizar stats
+      updateStats();
+
+      // Renderizar tarjetas
+      renderLigasCards();
+
+      // Renderizar pestañas de categorías y tabla
+      renderTableTabs();
+      renderStandingsTable();
+
+      // Renderizar sponsors
+      renderSponsors(data.sponsors || []);
+    });
+
+    // Filtros de Estado
+    const statusTabs = document.querySelectorAll('#statusTabs button');
+    statusTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        statusTabs.forEach(t => {
+          t.className = 'px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all whitespace-nowrap';
+        });
+        tab.className = 'px-4 py-2 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wide transition-all shadow-glow-lime whitespace-nowrap';
+        activeStatusFilter = tab.getAttribute('data-status') || "TODAS";
+        renderLigasCards();
+      });
+    });
+
+    // Filtros de Rama
+    const ramaButtons = document.querySelectorAll('#ramaPills button');
+    ramaButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        ramaButtons.forEach(b => {
+          b.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white font-bold text-xs uppercase';
+        });
+        btn.className = 'px-3 py-1.5 rounded-lg bg-brand-lime text-slate-950 font-black text-xs uppercase';
+        activeRamaFilter = btn.getAttribute('data-rama') || "TODOS";
+        renderLigasCards();
+      });
+    });
+
+    // Buscador
+    const searchInput = document.getElementById("ligaSearchInput");
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = (e.target.value || "").trim();
+        renderLigasCards();
+      });
+    }
+  });
+</script>
+</body>
+</html>

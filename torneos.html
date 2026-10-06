@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html class="h-full bg-slate-950 text-slate-100" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Torneos &amp; Fechas Especiales 2026 | PadelHub</title>
+  <!-- Tailwind CSS CDN with Forms and Container Queries -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- Tailwind Configuration -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            background: "#101419",
+            "surface-container": "#1c2025",
+            "surface-tint": "#98da27",
+            "on-surface": "#e0e2ea",
+            "on-surface-variant": "#c2cab0",
+            "surface-container-high": "#262a30",
+            "surface-container-lowest": "#0a0e13",
+            "surface-container-highest": "#31353b",
+            primary: "#ccff80",
+            "primary-container": "#a3e635",
+            "on-primary": "#213600",
+            secondary: "#adc6ff",
+            "secondary-container": "#0566d9",
+            "on-secondary-container": "#e6ecff",
+            tertiary: "#bdffc2",
+            "tertiary-fixed": "#6bff8f",
+            "tertiary-fixed-dim": "#4ae176",
+            brand: {
+              lime: '#a3e635',
+              limeHover: '#bef264',
+              limeDark: '#4d7c0f',
+              dark: '#090d16',
+              card: '#0f172a',
+            }
+          },
+          boxShadow: {
+            'glow-lime': '0 0 30px -5px rgba(163, 230, 53, 0.45)',
+            'glow-cyan': '0 0 25px -5px rgba(56, 189, 248, 0.25)',
+            'glow-gold': '0 0 30px -5px rgba(234, 179, 8, 0.35)',
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Court Graphic Texture & Animations -->
+  <style data-purpose="background-mesh">
+    .court-grid-pattern {
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(163, 230, 53, 0.14), transparent 50%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 64px 64px, 64px 64px;
+    }
+  </style>
+  <meta content="web_standard" name="shell-type"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+<body class="min-h-full flex flex-col font-sans court-grid-pattern antialiased selection:bg-brand-lime selection:text-slate-950">
+
+<!-- BEGIN: NavigationBar (Sin botón de Admin, enlaces funcionales) -->
+<header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <!-- Brand Logo -->
+    <a class="flex items-center gap-3 group" href="index.html" title="PadelHub Inicio">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-lime to-emerald-400 flex items-center justify-center shadow-glow-lime transform transition-transform group-hover:scale-105">
+        <i class="w-6 h-6 text-slate-950 stroke-[2.5]" data-lucide="shield"></i>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-2xl font-black tracking-tight text-white uppercase italic">
+          Padel<span class="text-brand-lime">Hub</span>
+        </span>
+        <span class="text-[10px] tracking-widest text-slate-400 font-semibold uppercase -mt-1">SISTEMA DE COMPETICIÓN</span>
+      </div>
+    </a>
+
+    <!-- Primary Navigation Links -->
+    <nav class="flex items-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold tracking-wide">
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="index.html">INICIO</a>
+      <a class="text-slate-400 hover:text-white transition-colors duration-150" href="ligas.html">LIGAS</a>
+      <a class="text-brand-lime border-b-2 border-brand-lime pb-1 font-bold" href="torneos.html">TORNEOS</a>
+      <a class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-700/60 text-slate-200 hover:border-brand-lime hover:text-brand-lime text-xs tracking-wider transition-all duration-200 shadow-sm" href="vivo.html">
+        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+        MARCADOR EN VIVO
+      </a>
+    </nav>
+  </div>
+</header>
+<!-- END: NavigationBar -->
+
+<!-- BEGIN: MainContent -->
+<main class="flex-grow flex items-center justify-center px-4 py-8 sm:px-6 lg:px-8 relative">
+  <div class="flex flex-col w-full max-w-7xl mx-auto">
+
+    <!-- 1. TOP HERO SECTION -->
+    <div class="relative w-full rounded-3xl overflow-hidden bg-slate-950 border border-brand-lime/30 shadow-glow-lime mb-10 group">
+      <div class="relative w-full min-h-[500px] lg:min-h-[560px] flex flex-col justify-end p-6 sm:p-10 lg:p-14 overflow-hidden">
+        <!-- Cinematic Background Action Shot -->
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 ease-out group-hover:scale-105" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7xay6CyG3jggUAwr0pn_WmRTHzjgkPAGOp_aJWTsdZUZ3aB4705nym8V8BqTi5RmUY4G-sHDfX8SMSzNBCt2G83cwzNQKVqxdorB0R5XGC3pA1oM86vu2XpG8BPQmxZZdEp52zPR9XlG84tIBak54LZNaPzUz7UKMZT7v0Lp2L324RYc1D3sEYRImHF4AyiEKRCenGtWHUDXcScH1tvmY2ialzPQQBrg9BNzlse4');"></div>
+        <!-- Multi-layered Gradients -->
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/75 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950"></div>
+        <!-- Ambient Glow Flares -->
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-brand-lime/20 blur-3xl pointer-events-none"></div>
+        <div class="absolute top-1/2 -right-32 w-96 h-96 rounded-full bg-cyan-500/20 blur-3xl pointer-events-none"></div>
+
+        <!-- Inner Content -->
+        <div class="relative z-10 max-w-4xl flex flex-col gap-5">
+          <!-- Breadcrumb & Circuit Signal -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-1.5 text-slate-400 text-xs uppercase tracking-widest font-bold">
+              <span>INICIO</span>
+              <span class="material-symbols-outlined text-xs text-brand-lime">chevron_right</span>
+              <span class="text-brand-lime font-black">TORNEOS Y COMPETENCIAS</span>
+            </div>
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-lime/20 border border-brand-lime/50 text-brand-lime font-black text-xs tracking-wider uppercase">
+              <span class="w-2 h-2 rounded-full bg-brand-lime animate-ping"></span>
+              CIRCUITO HOMOLOGADO 2026
+            </span>
+          </div>
+
+          <!-- Main Title -->
+          <div class="space-y-2">
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white uppercase italic tracking-tight drop-shadow-xl leading-none">
+              TORNEOS &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-lime via-lime-300 to-emerald-400 not-italic">FECHAS ESPECIALES PADELHUB 2026</span>
+            </h1>
+            <p class="text-base sm:text-lg lg:text-xl font-bold text-slate-200 uppercase tracking-wide flex items-center gap-2">
+              <span class="text-brand-lime">⚡</span> VIVÍ LA GLORIA EN CADA SET. COMPETENCIAS OFICIALES, PREMIOS EN EFECTIVO Y CUADROS EN TIEMPO REAL.
+            </p>
+          </div>
+
+          <!-- 4 Dynamic Stat Badges (Sincronizadas con la Base de Datos) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">🏆</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Inscripción</span>
+                <span id="hero-stat-abiertos" class="text-xs sm:text-sm font-black text-white tracking-wide">3 TORNEOS ABIERTOS</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">🔥</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">En Pistas</span>
+                <span id="hero-stat-enjuego" class="text-xs sm:text-sm font-black text-brand-lime tracking-wide">2 EN JUEGO ESTE FINDE</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="text-lg">💰</span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Pozo Oficial</span>
+                <span id="hero-stat-pozo" class="text-xs sm:text-sm font-black text-white tracking-wide">$2.500.000 EN PREMIOS</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-900/90 border border-slate-700/60 backdrop-blur-md shadow-lg hover:border-brand-lime/50 transition-colors">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
+              </span>
+              <div class="flex flex-col">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Transmisión</span>
+                <span class="text-xs sm:text-sm font-black text-cyan-300 tracking-wide">CANCHA 1 Y 2 STREAMING</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick CTA Row -->
+          <div class="flex flex-wrap items-center gap-4 pt-3">
+            <a id="hero-cta-wsp" class="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-lime to-lime-400 text-slate-950 font-black text-sm uppercase tracking-wider shadow-glow-lime hover:scale-[1.02] active:scale-[0.98] transition-all" href="#" rel="noopener noreferrer" target="_blank">
+              <span>INSCRIBIR MI PAREJA AHORA</span>
+              <span class="text-base font-bold">➔</span>
+            </a>
+            <a class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-sm uppercase tracking-wider border border-slate-700 backdrop-blur-md transition-all" href="#bracket-section">
+              <span class="material-symbols-outlined text-brand-lime text-base">account_tree</span>
+              <span>VER CUADROS EN VIVO ☵</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. FEATURED MAIN EVENT CARD (DINÁMICO DESDE ADMIN) -->
+    <section class="w-full mb-12" id="featured-tournament-container">
+      <!-- Se renderiza dinámicamente con los datos de Admin -->
+    </section>
+
+    <!-- 3. CATEGORY & DATE FILTERS BAR -->
+    <section class="w-full mb-8 flex flex-col gap-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl">
+        <!-- State Tabs -->
+        <div class="flex items-center overflow-x-auto gap-2 pb-2 lg:pb-0 scrollbar-none" id="tournamentStatusTabs">
+          <button data-status="TODOS" class="px-4 py-2 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wide transition-all shadow-glow-lime whitespace-nowrap">
+            TODOS (<span id="count-todos">0</span>)
+          </button>
+          <button data-status="INSCRIPCIONES" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <span class="w-2 h-2 rounded-full bg-brand-lime"></span>
+            INSCRIPCIONES ABIERTAS (<span id="count-insc">0</span>)
+          </button>
+          <button data-status="EN_JUEGO" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 whitespace-nowrap">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            EN JUEGO (<span id="count-juego">0</span>)
+          </button>
+          <button data-status="FINALIZADO" class="px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all whitespace-nowrap">
+            FINALIZADOS (<span id="count-fin">0</span>)
+          </button>
+        </div>
+
+        <!-- Category & Search Bar -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Category Pills -->
+          <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 overflow-x-auto gap-1" id="categoryPills">
+            <button data-cat="TODAS" class="px-2.5 py-1 rounded bg-brand-lime text-slate-950 font-black text-xs">TODAS</button>
+            <button data-cat="3ª" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">3ª</button>
+            <button data-cat="4ª" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">4ª</button>
+            <button data-cat="5ª" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">5ª</button>
+            <button data-cat="6ª" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">6ª</button>
+            <button data-cat="7ª" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">7ª</button>
+            <button data-cat="Suma" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs whitespace-nowrap">Suma Libres</button>
+            <button data-cat="Damas" class="px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs">Damas</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="relative min-w-[200px] flex-grow sm:flex-grow-0">
+            <span class="material-symbols-outlined absolute left-3 top-2 text-slate-400 text-base">search</span>
+            <input id="searchInput" class="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs pl-9 pr-3 py-2 rounded-xl placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-lime" placeholder="Buscar torneo o ciudad..." type="text"/>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TOURNAMENT CARDS GRID (ALIMENTADO DIRECTAMENTE DESDE ADMIN.HTML) -->
+    <section class="w-full mb-16">
+      <div id="tournamentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado dinámico -->
+      </div>
+    </section>
+
+    <!-- 5. SECCIÓN DE SPONSORS Y MARCAS PROMOCIONALES (DESDE ADMIN) -->
+    <section class="w-full mb-16" id="sponsors-section">
+      <div class="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 lg:p-10 shadow-2xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800 mb-6">
+          <div>
+            <span class="text-xs font-black text-brand-lime uppercase tracking-widest block mb-1">🤝 ALIANZAS OFICIALES</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">
+              SPONSORS &amp; MARCAS <span class="text-brand-lime not-italic font-extrabold">PADELHUB 2026</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm mt-1">Marcas líderes que impulsan el desarrollo y la premiación del circuito federado.</p>
+          </div>
+          <span class="px-3.5 py-1.5 rounded-full bg-brand-lime/10 border border-brand-lime/30 text-brand-lime font-black text-xs uppercase tracking-wider">
+            CIRCUITO OFICIAL
+          </span>
+        </div>
+
+        <div id="sponsorsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Renderizado dinámico de sponsors cargados en Admin -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. VISUALIZADOR DE CUADROS ELIMINATORIOS EN VIVO (DRAW BRACKET) -->
+    <section class="w-full mb-16" id="bracket-section">
+      <div class="rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 lg:p-10 shadow-2xl space-y-6">
+        <!-- Bracket Header & Controls -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-brand-lime animate-ping"></span>
+              <span class="text-xs font-black text-brand-lime uppercase tracking-widest">
+                🟢 CUADRO EN VIVO • OFICIAL
+              </span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tight">
+              VISUALIZADOR DE CUADROS <span class="text-brand-lime not-italic font-extrabold">(DRAW BRACKET)</span>
+            </h2>
+            <p class="text-slate-400 text-xs sm:text-sm mt-1">
+              Llave eliminatoria directa para 4ª Caballeros - Open San Miguel Pádel 2026
+            </p>
+          </div>
+          <!-- Interactive Category Filter for Draw -->
+          <div class="flex items-center gap-2">
+            <div class="px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 text-xs font-bold uppercase flex items-center gap-2">
+              <span class="material-symbols-outlined text-brand-lime text-base">category</span>
+              <span>Categoría: <strong class="text-white">4ª Caballeros</strong></span>
+            </div>
+            <button class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors" onclick="window.print()" title="Imprimir Llave PDF">
+              <span class="material-symbols-outlined text-lg">print</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- High-Tech Dark Glassmorphism Bracket Canvas -->
+        <div class="overflow-x-auto pb-4 scrollbar-none">
+          <div class="min-w-[850px] grid grid-cols-3 gap-6 items-center pt-2">
+            <!-- COLUMN 1: CUARTOS DE FINAL -->
+            <div class="space-y-6">
+              <div class="flex items-center justify-between px-2 pb-1 border-b border-slate-800">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">CUARTOS DE FINAL</span>
+                <span class="text-xs text-slate-500 font-mono">Sábado 18:30</span>
+              </div>
+              <!-- Match 1 -->
+              <div class="p-3.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2 shadow-lg">
+                <div class="flex items-center justify-between text-[11px] text-slate-400">
+                  <span class="font-mono">Match #1 • Cancha 1</span>
+                  <span class="px-2 py-0.5 rounded bg-brand-lime/20 text-brand-lime font-black text-[10px]">FINALIZADO</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center px-2.5 py-1.5 rounded-lg bg-slate-900 border border-brand-lime/30 text-white text-xs font-bold">
+                    <span class="truncate">Belasteguín / Coello</span>
+                    <span class="font-mono text-brand-lime font-black">6 · 6</span>
+                  </div>
+                  <div class="flex justify-between items-center px-2.5 py-1.5 rounded-lg bg-slate-900/50 text-slate-400 text-xs">
+                    <span class="truncate">Gutiérrez / Sanyo</span>
+                    <span class="font-mono">3 · 4</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Match 2 -->
+              <div class="p-3.5 rounded-xl bg-slate-950/90 border border-cyan-500/40 space-y-2 shadow-lg">
+                <div class="flex items-center justify-between text-[11px] text-slate-400">
+                  <span class="font-mono">Match #2 • Cancha 2</span>
+                  <span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-black text-[10px] animate-pulse">EN JUEGO</span>
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold">
+                    <span class="truncate">Lebrón / Galán</span>
+                    <span class="font-mono text-cyan-400 font-black">7 · 4</span>
+                  </div>
+                  <div class="flex justify-between items-center px-2.5 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold">
+                    <span class="truncate">Stupaczuk / Di Nenno</span>
+                    <span class="font-mono text-cyan-400 font-black">6 · 3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMN 2: SEMIFINAL CENTRAL -->
+            <div class="space-y-8">
+              <div class="flex items-center justify-between px-2 pb-1 border-b border-slate-800">
+                <span class="text-xs font-bold text-brand-lime uppercase tracking-wider">SEMIFINAL CENTRAL</span>
+                <span class="text-xs text-slate-500 font-mono">Domingo 11:00 hs</span>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-950/90 border border-brand-lime/30 space-y-3 shadow-xl">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="font-mono text-slate-400">SF-1 • Cancha Central</span>
+                  <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-bold text-[10px]">PROGRAMADO</span>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between items-center px-3 py-2 rounded-lg bg-slate-900 text-white text-xs font-black">
+                    <span class="truncate">Belasteguín / Coello</span>
+                    <span class="text-brand-lime font-mono">VS</span>
+                  </div>
+                  <div class="flex justify-between items-center px-3 py-2 rounded-lg bg-slate-900/60 text-slate-400 text-xs italic">
+                    <span class="truncate">Ganador Match #2</span>
+                    <span class="font-mono">-</span>
+                  </div>
+                </div>
+                <div class="flex items-center justify-between pt-1 text-[11px] text-slate-400">
+                  <span>Streaming TV en Vivo</span>
+                  <a class="text-brand-lime font-bold hover:underline" href="vivo.html">Ver streaming ➔</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUMN 3: GRAN FINAL -->
+            <div class="space-y-8">
+              <div class="flex items-center justify-between px-2 pb-1 border-b border-slate-800">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">GRAN FINAL COPA BABOLAT</span>
+                <span class="text-xs text-slate-500 font-mono">Domingo 19:30 hs</span>
+              </div>
+              <div class="p-5 rounded-2xl bg-slate-950 border border-amber-500/40 space-y-4 shadow-glow-gold">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-xl text-amber-400">trophy</span>
+                    <span class="text-xs font-black text-amber-400 uppercase tracking-wider">POR EL TÍTULO</span>
+                  </div>
+                  <span class="text-xs font-black text-brand-lime">$1.500.000</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="p-2.5 rounded-xl bg-slate-900 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Finalista Llave Alta</p>
+                    <p class="text-xs font-black text-white">Por Definir (SF-1)</p>
+                  </div>
+                  <div class="text-center text-[10px] font-black text-brand-lime uppercase">VS</div>
+                  <div class="p-2.5 rounded-xl bg-slate-900 text-center">
+                    <p class="text-[10px] text-slate-400 uppercase">Finalista Llave Baja</p>
+                    <p class="text-xs font-black text-white">Por Definir (SF-2)</p>
+                  </div>
+                </div>
+                <div class="text-center pt-1">
+                  <span class="text-[10px] text-slate-400 uppercase">Cancha Central • San Miguel Pádel Club</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. SEDE & FAQ SECTION -->
+    <section class="w-full mb-12">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <!-- Interactive Venue Map Card -->
+        <div class="lg:col-span-7 rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-xl flex flex-col justify-between space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-brand-lime text-xl">location_on</span>
+              <span class="text-sm font-black text-white uppercase tracking-wider">SEDE CENTRAL DEL CIRCUITO</span>
+            </div>
+            <span class="text-xs font-bold text-slate-400 uppercase">Frías, Santiago del Estero</span>
+          </div>
+          <div class="w-full h-56 bg-cover bg-center rounded-xl shadow-inner relative overflow-hidden flex items-end p-4 border border-slate-800" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDCGTfxkqT9o18_sqRzcl74GYG3BESKGuggjagFxUBTGUAWVfJCUHN9ptMeeL2uGF-eW7WrftzExjmOVgbDBhMe6RzihPu2_RRFHv_t8k0l318BlklHxr4TX9hLVLHAwblh1CHtbFGH7w2rvOzp-m8Xas1DEzLMmSSsBWWRsArl2jr7W8Hk8_Dw5o5Q1GL3SZonlhg6rJYk7KjXnAajguQZdvOV0J-_lCQiyrYGzyc');">
+            <div class="p-3 rounded-xl bg-slate-950/90 backdrop-blur-md text-xs text-white space-y-0.5 border border-slate-800">
+              <p class="font-bold text-brand-lime">San Miguel Pádel Club</p>
+              <p class="text-slate-300 text-[11px]">Canchas panorámicas techadas de nivel profesional y graderías</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-slate-400">
+            <span>Estacionamiento privado vigilado</span>
+            <span>Buffet &amp; Restó Bar</span>
+            <span>Vestuarios climatizados</span>
+            <a class="text-brand-lime font-bold hover:underline flex items-center gap-1" href="https://maps.google.com" rel="noopener noreferrer" target="_blank">
+              <span>Abrir en Google Maps</span>
+              <span class="material-symbols-outlined text-sm">open_in_new</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Frequently Asked Questions -->
+        <div class="lg:col-span-5 rounded-2xl bg-slate-900 border border-slate-800 p-6 shadow-xl space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <span class="text-xs font-black text-brand-lime uppercase tracking-wider block">PREGUNTAS FRECUENTES</span>
+            <h3 class="text-lg font-black text-white uppercase italic">¿Cómo funciona la inscripción oficial?</h3>
+            <div class="space-y-2 text-xs text-slate-300">
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="font-bold text-white mb-0.5">1. Envías los datos de la pareja</p>
+                <p class="text-slate-400">Nombres, DNI, teléfono y categoría a través de WhatsApp oficial.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="font-bold text-white mb-0.5">2. Confirmación de cupo y seña</p>
+                <p class="text-slate-400">Abonas la seña por transferencia para asegurar el lugar en el cuadro.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/80">
+                <p class="font-bold text-white mb-0.5">3. Publicación de zonas y horarios</p>
+                <p class="text-slate-400">Los cruces se publican los jueves a las 21:00 hs en este portal.</p>
+              </div>
+            </div>
+          </div>
+          <div class="pt-2">
+            <a id="faq-wsp-link" class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs uppercase tracking-wider transition-colors" href="#" rel="noopener noreferrer" target="_blank">
+              <span class="material-symbols-outlined text-base text-brand-lime">help</span>
+              <span>Hablar con el Coordinador del Torneo</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. TELEMETRÍA EN VIVO (SIN BOTÓN ADMIN) -->
+    <div class="w-full flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 mb-6">
+      <div class="flex items-center gap-2.5">
+        <span class="material-symbols-outlined text-brand-lime text-lg">cloud_done</span>
+        <span class="text-xs text-slate-300">
+          Los torneos, zonas y cuadros son administrados en tiempo real desde el sistema central <strong class="text-white">PadelHub</strong>.
+        </span>
+      </div>
+      <div class="flex items-center gap-2 text-xs uppercase tracking-widest text-slate-500 font-bold">
+        <span class="w-2 h-2 rounded-full bg-brand-lime"></span>
+        <span id="sync-timestamp">Sincronizado en vivo</span>
+      </div>
+    </div>
+
+  </div>
+</main>
+<!-- END: MainContent -->
+
+<!-- BEGIN: MainFooter -->
+<footer class="border-t border-slate-800/80 bg-slate-950 text-slate-500 text-xs py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2">
+      <span class="font-bold text-slate-300">PadelHub</span>
+      <span>•</span>
+      <span>Sistema y Circuito Oficial de Pádel © 2026</span>
+    </div>
+    <div class="flex items-center gap-6">
+      <a class="hover:text-slate-400 transition-colors" href="#">Términos del Circuito</a>
+      <a class="hover:text-slate-400 transition-colors" href="#">Privacidad de Jugadores</a>
+      <a class="hover:text-slate-400 transition-colors" href="#">Soporte Técnico</a>
+    </div>
+  </div>
+</footer>
+<!-- END: MainFooter -->
+
+<!-- DATA SCRIPTS & LOGIC -->
+<script src="js/firebase-config.js?v=5"></script>
+<script src="js/procup-data.js?v=5"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    let allTorneos = [];
+    let currentConfig = {};
+    let activeStatusFilter = "TODOS";
+    let activeCatFilter = "TODAS";
+    let searchQuery = "";
+
+    function getWaUrl(nombreTorneo) {
+      const num = (currentConfig && currentConfig.whatsappNumber) || "3854413049";
+      const clean = String(num).replace(/[^0-9]/g, "");
+      const text = nombreTorneo 
+        ? "Hola PadelHub, quiero inscribir mi pareja para el torneo " + nombreTorneo 
+        : "Hola PadelHub, quiero inscribir mi pareja para los torneos oficiales";
+      if (typeof ProcupData !== "undefined" && typeof ProcupData.buildWhatsappUrl === "function") {
+        return ProcupData.buildWhatsappUrl(clean, text);
+      }
+      return "https://wa.me/" + clean + "?text=" + encodeURIComponent(text);
+    }
+
+    function renderFeatured(featured) {
+      const container = document.getElementById("featured-tournament-container");
+      if (!featured) {
+        container.innerHTML = "";
+        return;
+      }
+
+      const total = featured.cuposTotal || 48;
+      const conf = featured.cuposConfirmados || 44;
+      const pct = Math.min(100, Math.round((conf / total) * 100));
+      const remaining = Math.max(0, total - conf);
+      const img = featured.imagen || "https://lh3.googleusercontent.com/aida-public/AB6AXuD4Y0VNtbTnWbZcG65rkVyAvhMDaGzd3ZA0aefnZH-2-230LZvi9Dtm1_2nGhCokNc9kX8bIzIBpG2eEquvjLPeqA6gNPnfILF7upHbKjiyl2yvkoCgmBSQ1FiSibVE7HdgAUTcDapP42kNdm7HRGSUEEvobBDYBw-G2Rtii9jg_nVEWLb6glKreBbpRKR4HUMiOxOencgSUP8UZIufZ5tSSVHRb-cr8Gz-wxZuOHs";
+      const waLink = featured.linkWhatsapp || getWaUrl(featured.nombre);
+
+      container.innerHTML = `
+        <div class="relative rounded-3xl overflow-hidden bg-slate-900 border border-amber-500/30 shadow-glow-gold group">
+          <div class="grid grid-cols-1 lg:grid-cols-12 items-center">
+            <div class="lg:col-span-5 relative h-80 lg:h-full min-h-[380px] overflow-hidden">
+              <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105" style="background-image: url('${img}');"></div>
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-slate-900 hidden lg:block"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent lg:hidden"></div>
+              <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+                <span class="px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 backdrop-blur-md text-amber-300 font-black text-xs uppercase tracking-widest flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-sm">emoji_events</span>
+                  EVENTO ESTELAR DE LA TEMPORADA
+                </span>
+                <span class="px-3 py-1 rounded-full bg-brand-lime/20 border border-brand-lime/50 backdrop-blur-md text-brand-lime font-black text-xs uppercase tracking-widest">
+                  ${featured.badge || "FECHA OFICIAL"}
+                </span>
+              </div>
+            </div>
+            <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-center gap-5">
+              <div class="flex items-center gap-2 text-amber-400 font-mono text-xs uppercase tracking-widest font-black">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                CIRCUITO MASTER PRO • PADELHUB
+              </div>
+              <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white uppercase italic tracking-tight leading-tight">
+                ${featured.nombre}<br/>
+                <span class="text-amber-400 not-italic font-extrabold text-xl sm:text-2xl tracking-normal">${featured.subtitulo || "COPA OFICIAL & CIRCUITO PRO"}</span>
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div class="w-9 h-9 rounded-lg bg-brand-lime/20 flex items-center justify-center text-brand-lime">
+                    <span class="material-symbols-outlined text-xl">calendar_today</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Fechas Oficiales</span>
+                    <span class="text-xs sm:text-sm font-bold text-white">${featured.fecha || "A confirmar"}</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div class="w-9 h-9 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400">
+                    <span class="material-symbols-outlined text-xl">stadium</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Sede Oficial</span>
+                    <span class="text-xs sm:text-sm font-bold text-white">${featured.lugar || "San Miguel Pádel Club • Frías"}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 rounded-2xl bg-slate-950/90 border border-slate-800 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                  <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Bolsa Asegurada de Premios</span>
+                    <span class="text-xl sm:text-2xl font-black text-brand-lime">${featured.bolsa || "$1.500.000"} <span class="text-xs font-bold text-slate-300 uppercase">en Efectivo + Puntos FAP Oficiales</span></span>
+                  </div>
+                  <div class="sm:text-right">
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wide block">Kits Babolat Pro</span>
+                    <span class="text-xs font-semibold text-slate-300">1° y 2° Puesto de Cada Cat</span>
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-300 font-bold">${conf} / ${total} Parejas confirmadas (${pct}% completo)</span>
+                    <span class="text-rose-400 font-black animate-pulse uppercase tracking-wider">¡ÚLTIMOS ${remaining} CUPOS!</span>
+                  </div>
+                  <div class="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-brand-lime to-emerald-400 rounded-full" style="width: ${pct}%;"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-1 flex flex-wrap items-center gap-3">
+                <a class="flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-brand-lime to-lime-400 hover:from-lime-400 hover:to-emerald-400 text-slate-950 font-black text-xs sm:text-sm uppercase tracking-wider text-center shadow-glow-lime flex items-center justify-center gap-2 transition-all" href="${waLink}" rel="noopener noreferrer" target="_blank">
+                  <span class="material-symbols-outlined text-lg">chat</span>
+                  <span>ANOTARME AHORA VÍA WHATSAPP</span>
+                  <span class="font-bold">➔</span>
+                </a>
+                <a class="px-5 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm uppercase tracking-wider border border-slate-700 flex items-center gap-1.5 transition-all" href="#bracket-section">
+                  <span class="material-symbols-outlined text-base text-brand-lime">draw</span>
+                  <span>Ver Cuadro</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTournaments() {
+      const grid = document.getElementById("tournamentsGrid");
+
+      // Filtrado
+      const filtered = allTorneos.filter(t => {
+        // Status filter
+        if (activeStatusFilter !== "TODOS") {
+          const st = (t.estado || "INSCRIPCIONES").toUpperCase();
+          if (activeStatusFilter === "INSCRIPCIONES" && st !== "INSCRIPCIONES") return false;
+          if (activeStatusFilter === "EN_JUEGO" && st !== "EN_JUEGO") return false;
+          if (activeStatusFilter === "FINALIZADO" && st !== "FINALIZADO") return false;
+        }
+
+        // Category filter
+        if (activeCatFilter !== "TODAS") {
+          const cats = (t.categorias || []).join(" ").toLowerCase();
+          const target = activeCatFilter.toLowerCase();
+          if (!cats.includes(target) && !(t.nombre || "").toLowerCase().includes(target)) return false;
+        }
+
+        // Search query
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const haystack = ((t.nombre || "") + " " + (t.subtitulo || "") + " " + (t.lugar || "") + " " + (t.categorias || []).join(" ")).toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+
+        return true;
+      });
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="col-span-full py-16 text-center rounded-3xl bg-slate-900/60 border border-slate-800">
+            <span class="material-symbols-outlined text-4xl text-slate-500 mb-2">sports_tennis</span>
+            <p class="text-base font-bold text-slate-300">No hay torneos que coincidan con los filtros seleccionados.</p>
+            <p class="text-xs text-slate-500 mt-1">Probá cambiando la categoría o restableciendo los filtros.</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(t => {
+        const estado = (t.estado || "INSCRIPCIONES").toUpperCase();
+        const cats = (t.categorias || []).join(" · ") || "Libre";
+        const waLink = t.linkWhatsapp || getWaUrl(t.nombre);
+        const total = t.cuposTotal || 16;
+        const conf = t.cuposConfirmados || 10;
+        const pct = Math.min(100, Math.round((conf / total) * 100));
+
+        // CARD CASO 1: EN JUEGO (LIVE)
+        if (estado === "EN_JUEGO") {
+          const vivo = t.marcadorVivo || { parejaA: "Gómez / Ruiz", scoreA: "6 · 4 · 40", parejaB: "Navarro / Tapia", scoreB: "4 · 6 · 30" };
+          return `
+            <article class="flex flex-col justify-between rounded-2xl bg-slate-900/90 border border-cyan-500/40 p-6 shadow-xl relative overflow-hidden group hover:border-cyan-400 hover:shadow-glow-cyan transition-all duration-300">
+              <div class="absolute -right-8 -top-8 w-36 h-36 bg-cyan-500/15 rounded-full blur-2xl group-hover:bg-cyan-500/25 transition-all"></div>
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500 text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-slate-950 animate-ping"></span>
+                    EN JUEGO AHORA / EN VIVO
+                  </span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-950 border border-cyan-500/40 text-cyan-300 font-black text-xs uppercase truncate max-w-[140px]">
+                    ${cats}
+                  </span>
+                </div>
+                <h3 class="text-xl font-black text-white uppercase italic mb-1 group-hover:text-cyan-300 transition-colors">
+                  ${t.nombre}
+                </h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-4">
+                  <span class="material-symbols-outlined text-cyan-400 text-base">stadium</span>
+                  <span>${t.lugar || "San Miguel Pádel Club • Cancha 1 (Central)"}</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 mb-4 space-y-2.5">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-400 uppercase font-bold">Fase en Cancha:</span>
+                    <span class="text-cyan-400 font-black">${t.faseActual || "SEMIFINAL CENTRAL"}</span>
+                  </div>
+                  <div class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 font-mono text-xs space-y-1">
+                    <div class="flex justify-between items-center text-white">
+                      <span class="font-bold truncate">${vivo.parejaA}</span>
+                      <span class="text-brand-lime font-black">${vivo.scoreA}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-300">
+                      <span class="truncate">${vivo.parejaB}</span>
+                      <span class="text-cyan-400 font-black">${vivo.scoreB}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-2">
+                <a class="w-full py-3.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider text-center shadow-glow-cyan flex items-center justify-center gap-2 transition-all" href="vivo.html">
+                  <span class="material-symbols-outlined text-base">tv</span>
+                  <span>VER MARCADOR EN VIVO</span>
+                  <span class="font-bold">➔</span>
+                </a>
+              </div>
+            </article>
+          `;
+        }
+
+        // CARD CASO 2: FINALIZADO
+        if (estado === "FINALIZADO") {
+          return `
+            <article class="flex flex-col justify-between rounded-2xl bg-slate-900/60 border border-slate-800 p-6 shadow-lg relative overflow-hidden group hover:border-slate-700 transition-all duration-300">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-slate-400 font-bold text-xs uppercase tracking-wider">
+                    FINALIZADO
+                  </span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 font-black text-xs uppercase truncate max-w-[140px]">
+                    ${cats}
+                  </span>
+                </div>
+                <h3 class="text-xl font-black text-slate-200 uppercase italic mb-1">
+                  ${t.nombre}
+                </h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-4">
+                  <span class="material-symbols-outlined text-amber-400 text-base">emoji_events</span>
+                  <span>${t.fecha || "Finalizado"} • ${t.lugar || "San Miguel Pádel"}</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 mb-4 flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-brand-lime/20 border border-brand-lime/40 flex items-center justify-center text-brand-lime flex-shrink-0">
+                    <span class="material-symbols-outlined">workspace_premium</span>
+                  </div>
+                  <div>
+                    <span class="block text-slate-400 text-[10px] font-bold uppercase">Campeones Oficiales:</span>
+                    <span class="text-sm font-black text-white">${t.campeones || "López / Martínez"}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="pt-2">
+                <a class="w-full py-3.5 px-4 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2" href="#bracket-section">
+                  <span class="material-symbols-outlined text-base">photo_library</span>
+                  <span>VER CUADRO Y RESULTADOS</span>
+                  <span class="font-bold">➔</span>
+                </a>
+              </div>
+            </article>
+          `;
+        }
+
+        // CARD CASO 3: PRÓXIMAMENTE
+        if (estado === "PROXIMO") {
+          return `
+            <article class="flex flex-col justify-between rounded-2xl bg-slate-900/90 border border-amber-500/30 p-6 shadow-xl relative overflow-hidden group hover:border-amber-400 transition-all duration-300">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 font-black text-xs uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    PRÓXIMAMENTE
+                  </span>
+                  <span class="px-3 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 font-black text-xs uppercase truncate max-w-[140px]">
+                    ${cats}
+                  </span>
+                </div>
+                <h3 class="text-xl font-black text-white uppercase italic mb-1 group-hover:text-amber-400 transition-colors">
+                  ${t.nombre}
+                </h3>
+                <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-4">
+                  <span class="material-symbols-outlined text-amber-400 text-base">calendar_month</span>
+                  <span>${t.fecha || "Próximamente"} • ${t.lugar || "PadelHub"}</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 mb-4 space-y-2">
+                  <span class="text-xs text-slate-400 uppercase font-bold block">Bolsa Proyectada:</span>
+                  <p class="text-xl font-black text-amber-400">${t.bolsa || "$2.000.000 en Premios"}</p>
+                  <p class="text-[11px] text-slate-400">Pre-registro abierto para sponsors y parejas federadas.</p>
+                </div>
+              </div>
+              <div class="pt-2">
+                <a class="w-full py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-2" href="${waLink}" target="_blank" rel="noopener">
+                  <span class="material-symbols-outlined text-base">notifications_active</span>
+                  <span>CONSULTAR APERTURA VÍA WSP</span>
+                  <span class="font-bold">➔</span>
+                </a>
+              </div>
+            </article>
+          `;
+        }
+
+        // CARD CASO 4: INSCRIPCIONES ABIERTAS (DEFAULT LIME)
+        return `
+          <article class="flex flex-col justify-between rounded-2xl bg-slate-900/90 border border-brand-lime/40 p-6 shadow-xl relative overflow-hidden group hover:border-brand-lime hover:shadow-glow-lime transition-all duration-300">
+            <div class="absolute -right-8 -top-8 w-36 h-36 bg-brand-lime/15 rounded-full blur-2xl group-hover:bg-brand-lime/25 transition-all"></div>
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-4">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wider shadow-sm">
+                  <span class="w-2 h-2 rounded-full bg-slate-950 animate-pulse"></span>
+                  ${t.badge || "INSCRIPCIONES ABIERTAS"}
+                </span>
+                <span class="px-3 py-1 rounded-lg bg-slate-950 border border-brand-lime/40 text-brand-lime font-black text-xs uppercase truncate max-w-[140px]">
+                  ${cats}
+                </span>
+              </div>
+              <h3 class="text-xl font-black text-white uppercase italic mb-1 group-hover:text-brand-lime transition-colors">
+                ${t.nombre}
+              </h3>
+              <div class="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-4">
+                <span class="material-symbols-outlined text-brand-lime text-base">event</span>
+                <span>${t.fecha || "Fechas a confirmar"} • ${t.lugar || "San Miguel Pádel Club"}</span>
+              </div>
+              <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800/80 mb-4 space-y-2.5">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-slate-400 font-bold uppercase">Cupos confirmados:</span>
+                  <span class="text-brand-lime font-black">${conf} / ${total} PAREJAS</span>
+                </div>
+                <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-brand-lime to-emerald-400 rounded-full" style="width: ${pct}%;"></div>
+                </div>
+                <div class="pt-1 flex items-center justify-between text-xs">
+                  <span class="text-slate-400">Premios:</span>
+                  <span class="text-white font-bold">${t.bolsa || "$500.000 + Trofeos"}</span>
+                </div>
+              </div>
+            </div>
+            <div class="pt-2">
+              <a class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-brand-lime to-lime-400 hover:from-lime-400 hover:to-emerald-400 text-slate-950 font-black text-xs uppercase tracking-wider text-center shadow-glow-lime flex items-center justify-center gap-2 transition-all" href="${waLink}" rel="noopener noreferrer" target="_blank">
+                <span class="material-symbols-outlined text-base">chat</span>
+                <span>INSCRIBIRSE POR WHATSAPP</span>
+                <span class="font-bold">➔</span>
+              </a>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderSponsors(sponsors) {
+      const grid = document.getElementById("sponsorsGrid");
+      if (!sponsors || !sponsors.length) {
+        document.getElementById("sponsors-section").style.display = "none";
+        return;
+      }
+      document.getElementById("sponsors-section").style.display = "block";
+
+      grid.innerHTML = sponsors.map(s => {
+        return `
+          <div class="rounded-2xl bg-slate-950/80 border border-slate-800 p-5 flex flex-col justify-between hover:border-brand-lime/40 transition-all group">
+            <div>
+              <div class="flex items-center justify-between gap-2 mb-3">
+                <span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-black text-brand-lime uppercase">
+                  ${s.tipo || "Sponsor Oficial"}
+                </span>
+                ${s.link ? `<a href="${s.link}" target="_blank" class="text-slate-500 hover:text-brand-lime text-xs flex items-center gap-1 transition-colors"><span class="material-symbols-outlined text-sm">open_in_new</span></a>` : ''}
+              </div>
+              ${s.logo ? `
+                <div class="w-full h-24 mb-3 rounded-xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-center overflow-hidden p-2">
+                  <img src="${s.logo}" alt="${s.nombre}" class="max-h-20 max-w-full object-contain group-hover:scale-105 transition-transform duration-300">
+                </div>
+              ` : ''}
+              <h4 class="text-base font-black text-white uppercase italic">${s.nombre}</h4>
+              ${s.categoria ? `<p class="text-xs text-amber-400 font-bold mb-1">${s.categoria}</p>` : ''}
+              ${s.descripcion ? `<p class="text-xs text-slate-400 mt-1">${s.descripcion}</p>` : ''}
+            </div>
+            ${s.video ? `
+              <div class="mt-4 pt-3 border-t border-slate-800/80">
+                <a href="${s.video}" target="_blank" class="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-cyan-300 text-xs font-bold flex items-center justify-center gap-2 transition-all">
+                  <span class="material-symbols-outlined text-sm text-cyan-400">play_circle</span>
+                  <span>Ver Spot / Video Promocional</span>
+                </a>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function updateBadgeCounters() {
+      const abiertos = allTorneos.filter(t => (t.estado || "INSCRIPCIONES").toUpperCase() === "INSCRIPCIONES").length;
+      const juego = allTorneos.filter(t => (t.estado || "").toUpperCase() === "EN_JUEGO").length;
+      const fin = allTorneos.filter(t => (t.estado || "").toUpperCase() === "FINALIZADO").length;
+
+      document.getElementById("count-todos").textContent = allTorneos.length;
+      document.getElementById("count-insc").textContent = abiertos;
+      document.getElementById("count-juego").textContent = juego;
+      document.getElementById("count-fin").textContent = fin;
+
+      document.getElementById("hero-stat-abiertos").textContent = abiertos + " TORNEOS ABIERTOS";
+      document.getElementById("hero-stat-enjuego").textContent = juego + " EN JUEGO ESTE FINDE";
+    }
+
+    // CARGAR DATOS DESDE PROCUPDATA (ADMIN.HTML DATABASE)
+    ProcupData.loadAll().then(data => {
+      currentConfig = data.config || {};
+      allTorneos = data.torneos || [];
+
+      // Link principal de WhatsApp del Hero y FAQ
+      const heroWsp = document.getElementById("hero-cta-wsp");
+      if (heroWsp) heroWsp.href = getWaUrl();
+      const faqWsp = document.getElementById("faq-wsp-link");
+      if (faqWsp) faqWsp.href = getWaUrl();
+
+      // Torneo destacado
+      const featured = allTorneos.find(t => t.esDestacado) || allTorneos[0];
+      renderFeatured(featured);
+
+      // Conteo e inicialización
+      updateBadgeCounters();
+      renderTournaments();
+
+      // Sponsors
+      renderSponsors(data.sponsors || []);
+    });
+
+    // Eventos de Filtros de Estado
+    const statusTabs = document.querySelectorAll('#tournamentStatusTabs button');
+    statusTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        statusTabs.forEach(t => {
+          t.className = 'px-4 py-2 rounded-xl bg-slate-800/80 text-slate-300 hover:text-white hover:bg-slate-800 font-bold text-xs uppercase tracking-wide transition-all flex items-center gap-1.5 whitespace-nowrap';
+        });
+        tab.className = 'px-4 py-2 rounded-xl bg-brand-lime text-slate-950 font-black text-xs uppercase tracking-wide transition-all shadow-glow-lime whitespace-nowrap';
+        activeStatusFilter = tab.getAttribute('data-status') || "TODOS";
+        renderTournaments();
+      });
+    });
+
+    // Eventos de Categoría
+    const catButtons = document.querySelectorAll('#categoryPills button');
+    catButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        catButtons.forEach(b => {
+          b.className = 'px-2.5 py-1 rounded text-slate-400 hover:text-white font-bold text-xs whitespace-nowrap';
+        });
+        btn.className = 'px-2.5 py-1 rounded bg-brand-lime text-slate-950 font-black text-xs whitespace-nowrap';
+        activeCatFilter = btn.getAttribute('data-cat') || "TODAS";
+        renderTournaments();
+      });
+    });
+
+    // Buscador
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = (e.target.value || "").trim();
+        renderTournaments();
+      });
+    }
+  });
+</script>
+</body>
+</html>

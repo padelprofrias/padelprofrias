@@ -1,0 +1,10 @@
+{
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/vivo", "destination": "/vivo.html" },
+    { "source": "/marcador", "destination": "/marcador.html" },
+    { "source": "/torneos", "destination": "/torneos.html" },
+    { "source": "/ligas", "destination": "/ligas.html" }
+  ]
+}
